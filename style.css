@@ -26,61 +26,83 @@ header {
 #controls {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
   gap: 5px;
   padding: 10px;
   background-color: white;
 }
 
-button, input[type="file"] {
-  -webkit-appearance: none; /* Safari and Chrome */
-  -moz-appearance: none;    /* Firefox */
-  appearance: none;         /* Modern browsers */
+button,
+input[type="file"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   padding: 3px;
   font-size: 0.7em;
-  background-color: #e0e0e0; /* Custom button background */
-  border: 1px solid black;    /* Custom button border */
-      /* Rounded corners */
-  cursor: pointer;           /* Pointer cursor on hover */
+  background-color: #e0e0e0;
+  border: 1px solid black;
+  cursor: pointer;
 }
 
 input[type="range"] {
-  -webkit-appearance: none; /* Safari and Chrome */
-  -moz-appearance: none;    /* Firefox */
-  appearance: none;         /* Modern browsers */
-  width: 100px;             /* Custom width */
-  background-color: transparent; /* Remove default background */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100px;
+  border: 1px solid black;
+  background-color: lightgray;
 }
 
+
+#volume-control {
+  border: 1px solid darkgray;
+  padding: 6px;
+  font-size: 0.85em;
+  font-weight: lighter;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+}       
+
+
 input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; /* Remove default thumb appearance */
+  -webkit-appearance: none;
   appearance: none;
-  width: 15px;              /* Custom thumb width */
-  height: 15px;             /* Custom thumb height */
-  background-color: #007BFF; /* Custom thumb color */
-      /* Rounded thumb */
-  cursor: pointer;          /* Pointer cursor on hover */
+  width: 15px;
+  height: 15px;
+  margin: 2px;
+  border: 1px solid black;
+  background-color: white;
+  cursor: pointer;
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 15px;              /* Custom thumb width */
-  height: 15px;             /* Custom thumb height */
-  background-color: #007BFF; /* Custom thumb color */
-       /* Rounded thumb */
-  cursor: pointer;          /* Pointer cursor on hover */
+  width: 15px;
+  height: 15px;
+  margin: 2px;
+  border: 1px solid black;
+  background-color: white;
+  cursor: pointer;
 }
 
 input[type="range"]::-ms-thumb {
-  width: 15px;              /* Custom thumb width */
-  height: 15px;             /* Custom thumb height */
-  background-color: #007BFF; /* Custom thumb color */
-      /* Rounded thumb */
-  cursor: pointer;          /* Pointer cursor on hover */
+  width: 15px;
+  height: 15px;
+  margin: 2px;
+  border: 1px solid black;
+  background-color: white;
+  cursor: pointer;
 }
 
-button:hover, input[type="file"]:hover, input[type="range"]::-webkit-slider-thumb:hover {
-  background-color: #d0d0d0; /* Custom hover background */
+button:hover,
+input[type="file"]:hover,
+input[type="range"]::-webkit-slider-thumb:hover {
+  background-color: #d0d0d0;
 }
 
-button:active, input[type="file"]:active, input[type="range"]::-webkit-slider-thumb:active {
-  background-color: #c0c0c0; /* Custom active background */
+button:active,
+input[type="file"]:active,
+input[type="range"]::-webkit-slider-thumb:active {
+  background-color: #c0c0c0;
 }
