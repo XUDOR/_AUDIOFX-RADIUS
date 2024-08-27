@@ -8,11 +8,19 @@ body {
 }
 
 header {
+  margin: 5px;
   display: flex;
   flex-direction: row;
   align-items: start;
   margin-bottom: 10px;
   flex-wrap: wrap;
+}
+
+.headCont {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+
 }
 
 .title {
@@ -22,6 +30,8 @@ header {
   font-weight: lighter;
   text-align: center;
   margin-bottom: 20px;
+  width: 10%;
+  flex-wrap: wrap;
 }
 
 #controls {
@@ -133,15 +143,30 @@ input[type="range"]::-webkit-slider-thumb:active {
   padding: 5px;
 }
 
-.meter{
+.meter {
   border: 1px solid black;
   display: flex;
-  justify-content: center;
   align-items: center;
   text-align: left;
-  font-size: .8em;
+  font-size: 0.8em;
   padding: 5px;
+  width: 100px; /* Fixed width for the meter */
+  height: 20px; /* Fixed height for the meter */
+  background-color: #e0e0e0; /* Light grey background for the meter */
+  position: relative; /* Positioning context for the inner bar */
+  overflow: hidden; /* Hide overflow of inner bar */
 }
+
+.meter-fill {
+  background-color: #4CAF50; /* Green color for the filled part of the meter */
+  height: 100%; /* Fill height */
+  width: 0; /* Start with width 0 */
+  transition: width 0.1s; /* Smooth transition effect for width change */
+  position: absolute; /* Position absolute to overlay inside the meter */
+  left: 0;
+  top: 0;
+}
+
 
 
 
@@ -168,6 +193,23 @@ input[type="range"]::-webkit-slider-thumb:active {
 background-color: blue;
 
 }
+
+/* ===========================MAIN===================================== */
+
+.effectContainer {
+  margin: 5px;
+  border: 1px solid black;
+  height: 200px;
+  width: 200px;
+}
+
+
+
+
+
+
+
+
 
 
 
