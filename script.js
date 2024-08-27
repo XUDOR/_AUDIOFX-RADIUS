@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const volumeControl = document.getElementById('volume');
     const timeDisplay = document.querySelector('.time');
     const seekBar = document.getElementById('seekBar');
+    const jsonButton = document.querySelector('.json');
 
     let audioContext;
     let audioBuffer;
@@ -17,6 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let elapsedTime = 0;
     let isSeeking = false;
     let isLooping = false;
+    const logs = []; // Array to store logs
+
+    function addLog(message) {
+        logs.push({ timestamp: new Date().toISOString(), message });
+        console.log(message);
+    }
 
     // Initialize the AudioContext after user gesture
     onButton.addEventListener('click', () => {
@@ -25,11 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
             gainNode = audioContext.createGain();
             gainNode.gain.value = 0.5; // Set initial volume
 
-            // Change border color when audio context is initialized
             onButton.style.border = "2px solid #56a82f";
-            console.log('Audio context initialized.');
+            addLog('Audio context initialized.');
         } else {
-            console.log('Audio context already initialized.');
+            addLog('Audio context already initialized.');
         }
     });
 
@@ -37,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     volumeControl.addEventListener('input', (e) => {
         if (gainNode) {
             gainNode.gain.value = e.target.value;
-            console.log(`Volume changed: ${gainNode.gain.value}`);
+            addLog(`Volume changed: ${gainNode.gain.value}`);
         }
     });
 
@@ -52,16 +58,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     audioBuffer = buffer;
                     seekBar.max = audioBuffer.duration;
                     updateSeekBar();
-                    console.log('Audio file loaded and decoded.');
+                    addLog('Audio file loaded and decoded.');
                 });
             }
         };
 
         if (file) {
             reader.readAsArrayBuffer(file);
-            console.log('Reading audio file...');
+            addLog('Reading audio file...');
         } else {
-            console.log('No file selected.');
+            addLog('No file selected.');
         }
     });
 
@@ -72,13 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 playAudio();
                 playButton.style.border = "2px solid #007bff"; // Blue border for playing
                 stopButton.style.border = "1px solid black"; // Reset stop button border
-                console.log('Playing audio.');
+                addLog('Playing audio.');
             } else {
                 pauseAudio(); // Pause if currently playing
-                console.log('Pausing audio.');
+                addLog('Pausing audio.');
             }
         } else {
-            console.log('No audio buffer or audio context available.');
+            addLog('No audio buffer or audio context available.');
         }
     });
 
@@ -95,16 +101,16 @@ document.addEventListener('DOMContentLoaded', () => {
         source.onended = () => {
             if (!isLooping) {
                 pauseAudio();
-                console.log('Audio playback ended.');
+                addLog('Audio playback ended.');
             } else {
                 elapsedTime = 0;  // Reset elapsed time for looping
                 playAudio();  // Restart audio for loop
-                console.log('Looping audio.');
+                addLog('Looping audio.');
             }
         };
 
         updateSeekBar();
-        console.log('Audio started from position:', elapsedTime);
+        addLog('Audio started from position: ' + elapsedTime);
     }
 
     // Pause audio without resetting
@@ -116,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             elapsedTime = pauseTime;
             playButton.style.border = "1px solid black"; // Reset play button border
             stopButton.style.border = "2px solid #ff0000"; // Red border for paused
-            console.log('Audio paused at position:', elapsedTime);
+            addLog('Audio paused at position: ' + elapsedTime);
         }
     }
 
@@ -129,9 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
             seekBar.value = 0;
             playButton.style.border = "1px solid black"; // Reset play button border
             stopButton.style.border = "2px solid #ff0000"; // Red border for stopped
-            console.log('Audio stopped.');
+            addLog('Audio stopped.');
         } else {
-            console.log('No audio is currently playing to stop.');
+            addLog('No audio is currently playing to stop.');
         }
     });
 
@@ -141,11 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
             isLooping = !isLooping;
             if (source) source.loop = isLooping;  // Update source loop state
 
-            // Change border color when loop is active
             loopButton.style.border = isLooping ? "2px solid #f4d30c" : "1px solid black";
-            console.log('Looping set to:', isLooping);
+            addLog('Looping set to: ' + isLooping);
         } else {
-            console.log('No audio buffer or context to loop.');
+            addLog('No audio buffer or context to loop.');
         }
     });
 
@@ -156,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
             seekBar.value = elapsedTime;
             timeDisplay.textContent = `time: ${formatTime(elapsedTime)} / ${formatTime(audioBuffer.duration)}`;
             requestAnimationFrame(updateSeekBar);
-            console.log('Seek bar updated:', elapsedTime);
+            addLog('Seek bar updated: ' + elapsedTime);
         }
     }
 
@@ -166,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isSeeking = true;
             elapsedTime = parseFloat(e.target.value);
             timeDisplay.textContent = `time: ${formatTime(elapsedTime)} / ${formatTime(audioBuffer.duration)}`;
-            console.log('Seeking to:', elapsedTime);
+            addLog('Seeking to: ' + elapsedTime);
         }
     });
 
@@ -175,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isPlaying) {
                 source.stop();
                 playAudio();
-                console.log('Resuming audio after seek.');
+                addLog('Resuming audio after seek.');
             }
             isSeeking = false;
         }
@@ -187,4 +192,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const remainingSeconds = Math.floor(seconds % 60);
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     }
+
+    // JSON export functionality
+    jsonButton.addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'console_logs.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        addLog('Logs exported as JSON.');
+    });
 });
