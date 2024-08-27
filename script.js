@@ -13,7 +13,8 @@ const elements = {
     seekBar: document.getElementById('seekBar'),
     jsonButton: document.querySelector('.json'),
     zeroButton: document.querySelector('.zero'),
-    meterDisplay: document.querySelector('.meter')
+    meterDisplay: document.querySelector('.meter'),  // <-- Add a comma here
+    toggleDelayButton: document.getElementById('toggleDelay')  // <-- Correct placement
 };
 
 // --- Initializations ---
@@ -30,6 +31,7 @@ const audioApp = {
     elapsedTime: 0,
     isSeeking: false,
     isLooping: false,
+    isDelayOn: true,  // Initialize delay state
 
     initializeAudioContext() {
         if (!this.context) {
@@ -122,6 +124,19 @@ const audioApp = {
         audioApp.log('Audio started from position: ' + this.elapsedTime);
     },
 
+    toggleDelay() {  // <-- Add toggleDelay function here
+        if (this.isDelayOn) {
+            this.source.disconnect();
+            this.source.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+            audioApp.log('Delay effect turned off.');
+        } else {
+            this.source.disconnect();
+            this.source.connect(this.delayNode).connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+            audioApp.log('Delay effect turned on.');
+        }
+        this.isDelayOn = !this.isDelayOn; // Toggle state
+    },
+
     pauseAudio() {
         if (this.source) {
             this.source.stop();
@@ -211,6 +226,8 @@ elements.loopButton.addEventListener('click', () => {
         audioApp.log('No audio buffer or context to loop.');
     }
 });
+
+elements.toggleDelayButton.addEventListener('click', () => audioApp.toggleDelay());  // <-- Add this line
 
 // --- End of Script Execution ---
 elements.jsonButton.addEventListener('click', () => {
