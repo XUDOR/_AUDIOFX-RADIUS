@@ -47,9 +47,17 @@ input[type="file"] {
 
 #on {
   background-color: white;
+}
 
+.zero {
+  border: 1px solid black;
+  height: 40px;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
 
 }
+
 
 input[type="range"] {
   -webkit-appearance: none;
@@ -104,13 +112,13 @@ input[type="range"]::-ms-thumb {
 button:hover,
 input[type="file"]:hover,
 input[type="range"]::-webkit-slider-thumb:hover {
-  background-color: #d0d0d0;
+  background-color: #d1d6c5;
 }
 
 button:active,
 input[type="file"]:active,
 input[type="range"]::-webkit-slider-thumb:active {
-  background-color: #c0c0c0;
+  background-color: #f4f4ea;
 }
 
 
