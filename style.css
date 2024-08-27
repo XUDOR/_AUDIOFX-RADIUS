@@ -61,6 +61,11 @@ button {
   height: 50px;
   width: 50px;
   background-color: white;
+
+  &:hover {
+    background-color: #d1d6c5;  /* Change color on hover */
+    border: 2px solid #55661f;
+  }
 }
 
 .zero {
@@ -69,9 +74,7 @@ button {
   padding: 10px;
   justify-content: center;
   align-items: center;
-
 }
-
 
 input[type="file"] {
   -webkit-appearance: none;
@@ -82,7 +85,6 @@ input[type="file"] {
   background-color: #e0e0e0;
   border: 1px solid black;
   cursor: pointer;
-  
 }
 
 input[type="range"] {
@@ -100,10 +102,7 @@ input[type="range"] {
   align-items: center;
 }
 
-
-
 #volume-control {
-
   font-size: 0.7em;
   text-align: left;
   font-weight: lighter;
@@ -116,7 +115,6 @@ input[type="range"] {
 #volume {
   margin-top: 10px;
 }
-
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -159,7 +157,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   background-color: #f4f4ea;
 }       
 
-
 .time {
   border: 1px solid black;
   display: flex;
@@ -178,11 +175,10 @@ input[type="range"]::-webkit-slider-thumb:active {
   width: 100px;
   height: 40px;
   position: relative;
-  overflow: hidden
+  overflow: hidden;
 }
 
 .meter {
-  
   display: flex;
   align-items: center;
   width: 100px;
@@ -201,10 +197,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   left: 0;
   top: 0;
 }
-
-
-
-
 
 .json {
   display: flex;
@@ -226,7 +218,6 @@ input[type="range"]::-webkit-slider-thumb:active {
 
 .json:hover {
   background-color: blue;
-
 }
 
 /* ===========================MAIN===================================== */
@@ -245,6 +236,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   font-weight: lighter;
 }
 
+/* Styles for the toggle delay button with hover effect */
 #toggleDelay {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -257,8 +249,15 @@ input[type="range"]::-webkit-slider-thumb:active {
   cursor: pointer;
   width: 40px;
   height: 40px;
-  
 
+  &:hover {
+    background-color: #d1d6c5;  /* Change color on hover */
+    border: 2px solid #55661f;
+  }
+
+  &:active {
+    background-color: #f4f4ea;  /* Change color on active */
+  }
 }
 
 /* ==========================RESPONSIVE===================================== */
@@ -266,16 +265,12 @@ input[type="range"]::-webkit-slider-thumb:active {
 @media (max-width: 768px) {
   header {
     flex-direction: column;
-    /* Change to column layout on small screens */
-    align-items: center;
-    /* Center align for better mobile appearance */
+    align-items: center; /* Center align for better mobile appearance */
   }
 
   #controls {
     width: 100%;
-    /* Ensure controls take full width */
-    justify-content: center;
-    /* Center controls */
+    justify-content: center; /* Center controls */
   }
 }
 
@@ -295,8 +290,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   gap: 5px;
   padding: 10px;
   background-color: white;
-  width: 100%;
-  /* Added width to make it responsive */
+  width: 100%; /* Added width to make it responsive */
 }
 
 button,
