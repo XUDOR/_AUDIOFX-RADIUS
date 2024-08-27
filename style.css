@@ -12,13 +12,14 @@ header {
   flex-direction: row;
   align-items: start;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
 .title {
-  border: 3px solid gray;
+  border: 1px solid gray;
   padding: 10px;
   font-size: 1em;
-  font-weight: bold;
+  font-weight: lighter;
   text-align: center;
   margin-bottom: 20px;
 }
@@ -132,6 +133,18 @@ input[type="range"]::-webkit-slider-thumb:active {
   padding: 5px;
 }
 
+.meter{
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+  font-size: .8em;
+  padding: 5px;
+}
+
+
+
 
 .json {
   display: flex;
@@ -154,4 +167,86 @@ input[type="range"]::-webkit-slider-thumb:active {
 .json:hover {
 background-color: blue;
 
+}
+
+
+
+
+
+
+
+/* ===========================RESPONSIVE===================================== */
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column; /* Change to column layout on small screens */
+    align-items: center; /* Center align for better mobile appearance */
+  }
+
+  #controls {
+    width: 100%; /* Ensure controls take full width */
+    justify-content: center; /* Center controls */
+  }
+}
+
+.title {
+  border: 3px solid gray;
+  padding: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#controls {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 10px;
+  background-color: white;
+  width: 100%; /* Added width to make it responsive */
+}
+
+button,
+input[type="file"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 3px;
+  font-size: 0.7em;
+  background-color: #e0e0e0;
+  border: 1px solid black;
+  cursor: pointer;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100px;
+  border: 1px solid black;
+  background-color: lightgray;
+}
+
+button:hover,
+input[type="file"]:hover,
+input[type="range"]::-webkit-slider-thumb:hover {
+  background-color: #d0d0d0;
+}
+
+button:active,
+input[type="file"]:active,
+input[type="range"]::-webkit-slider-thumb:active {
+  background-color: #c0c0c0;
+}
+
+.time {
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+  font-size: .8em;
+  padding: 5px;
 }
