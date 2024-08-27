@@ -12,26 +12,24 @@ header {
   display: flex;
   flex-direction: row;
   align-items: start;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
+  margin-bottom: 5px;
+  align-items: center;
 }
 
 .headCont {
   display: flex;
   flex-direction: row;
   gap: 10px;
-
+  align-items: center;
 }
 
 .title {
+  display: block;
   border: 1px solid gray;
   padding: 10px;
   font-size: 1em;
   font-weight: lighter;
   text-align: center;
-  margin-bottom: 20px;
-  width: 10%;
-  flex-wrap: wrap;
 }
 
 #controls {
@@ -39,13 +37,12 @@ header {
   flex-direction: row;
   flex-wrap: wrap;
   width: 100%;
-  gap: 5px;
-  padding: 10px;
+  margin: 5px;
+  gap: 10px;
   background-color: white;
 }
 
-button,
-input[type="file"] {
+button {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -54,9 +51,13 @@ input[type="file"] {
   background-color: #e0e0e0;
   border: 1px solid black;
   cursor: pointer;
+  width: 40px;
+  height: 40px;
 }
 
 #on {
+  height: 50px;
+  width: 50px;
   background-color: white;
 }
 
@@ -70,6 +71,18 @@ input[type="file"] {
 }
 
 
+input[type="file"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 3px;
+  font-size: 0.7em;
+  background-color: #e0e0e0;
+  border: 1px solid black;
+  cursor: pointer;
+  
+}
+
 input[type="range"] {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -79,43 +92,52 @@ input[type="range"] {
   background-color: lightgray;
 }
 
+.transport {
+  padding: 3px;
+  border: 2px solid #55661f;
+  align-items: center;
+}
+
+
 
 #volume-control {
-  border: 1px solid darkgray;
-  padding: 6px;
-  font-size: 0.85em;
-  font-weight: lighter;
-  justify-content: center;
-  align-items: center;
+  
+  
+  font-size: 0.7em;
   text-align: left;
-}       
+  font-weight: lighter;
+  align-items: center;
+ 
+  display: flex;
+  flex-direction: column;
+}
 
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 15px;
-  height: 15px;
-  margin: 2px;
-  border: 1px solid black;
+  height: 40px;
+  margin: 1px;
+  border: 1px solid gray;
   background-color: white;
   cursor: pointer;
 }
 
 input[type="range"]::-moz-range-thumb {
   width: 15px;
-  height: 15px;
+  height: 40px;
   margin: 2px;
-  border: 1px solid black;
+  border: 1px solid gray;
   background-color: white;
   cursor: pointer;
 }
 
 input[type="range"]::-ms-thumb {
   width: 15px;
-  height: 15px;
+  height: 40px;
   margin: 2px;
-  border: 1px solid black;
+  border: 1px solid gray;
   background-color: white;
   cursor: pointer;
 }
@@ -143,26 +165,34 @@ input[type="range"]::-webkit-slider-thumb:active {
   padding: 5px;
 }
 
-.meter {
+.meterCont {
+  margin: 3px;
   border: 1px solid black;
   display: flex;
   align-items: center;
-  text-align: left;
-  font-size: 0.8em;
-  padding: 5px;
-  width: 100px; /* Fixed width for the meter */
-  height: 20px; /* Fixed height for the meter */
-  background-color: #e0e0e0; /* Light grey background for the meter */
-  position: relative; /* Positioning context for the inner bar */
-  overflow: hidden; /* Hide overflow of inner bar */
+  width: 100px;
+  height: 40px;
+  position: relative;
+  overflow: hidden
+}
+
+.meter {
+  
+  display: flex;
+  align-items: center;
+  width: 100px;
+  height: 40px;
+  background-color: #e0e0e0;
+  position: relative;
+  overflow: hidden;
 }
 
 .meter-fill {
-  background-color: #4CAF50; /* Green color for the filled part of the meter */
-  height: 100%; /* Fill height */
-  width: 0; /* Start with width 0 */
-  transition: width 0.1s; /* Smooth transition effect for width change */
-  position: absolute; /* Position absolute to overlay inside the meter */
+  background-color: #79a31c;
+  height: 100%;
+  width: 0;
+  transition: width 0.1s;
+  position: absolute;
   left: 0;
   top: 0;
 }
@@ -190,7 +220,7 @@ input[type="range"]::-webkit-slider-thumb:active {
 }
 
 .json:hover {
-background-color: blue;
+  background-color: blue;
 
 }
 
@@ -221,13 +251,17 @@ background-color: blue;
 
 @media (max-width: 768px) {
   header {
-    flex-direction: column; /* Change to column layout on small screens */
-    align-items: center; /* Center align for better mobile appearance */
+    flex-direction: column;
+    /* Change to column layout on small screens */
+    align-items: center;
+    /* Center align for better mobile appearance */
   }
 
   #controls {
-    width: 100%; /* Ensure controls take full width */
-    justify-content: center; /* Center controls */
+    width: 100%;
+    /* Ensure controls take full width */
+    justify-content: center;
+    /* Center controls */
   }
 }
 
@@ -247,7 +281,8 @@ background-color: blue;
   gap: 5px;
   padding: 10px;
   background-color: white;
-  width: 100%; /* Added width to make it responsive */
+  width: 100%;
+  /* Added width to make it responsive */
 }
 
 button,
