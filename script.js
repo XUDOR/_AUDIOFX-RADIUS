@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeDisplay = document.querySelector('.time');
     const seekBar = document.getElementById('seekBar');
     const jsonButton = document.querySelector('.json');
+    const zeroButton = document.querySelector('.zero');
 
     let audioContext;
     let audioBuffer;
@@ -18,20 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let elapsedTime = 0;
     let isSeeking = false;
     let isLooping = false;
-    const logs = []; // Array to store logs
+    const logs = [];
 
     function addLog(message) {
         logs.push({ timestamp: new Date().toISOString(), message });
         console.log(message);
     }
 
-    // Initialize the AudioContext after user gesture
     onButton.addEventListener('click', () => {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             gainNode = audioContext.createGain();
-            gainNode.gain.value = 0.5; // Set initial volume
-
+            gainNode.gain.value = 0.5;
             onButton.style.border = "2px solid #56a82f";
             addLog('Audio context initialized.');
         } else {
@@ -39,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle volume changes
     volumeControl.addEventListener('input', (e) => {
         if (gainNode) {
             gainNode.gain.value = e.target.value;
@@ -47,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle file input
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
@@ -71,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Play or Resume audio
     playButton.addEventListener('click', () => {
         if (audioBuffer && audioContext) {
             if (!isPlaying) {
@@ -80,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stopButton.style.border = "1px solid black"; // Reset stop button border
                 addLog('Playing audio.');
             } else {
-                pauseAudio(); // Pause if currently playing
+                pauseAudio();
                 addLog('Pausing audio.');
             }
         } else {
@@ -92,20 +88,20 @@ document.addEventListener('DOMContentLoaded', () => {
         source = audioContext.createBufferSource();
         source.buffer = audioBuffer;
         source.connect(gainNode).connect(audioContext.destination);
-        source.loop = isLooping;  // Set loop state
+        source.loop = false;
 
         startTime = audioContext.currentTime - elapsedTime;
         source.start(0, elapsedTime);
         isPlaying = true;
 
         source.onended = () => {
-            if (!isLooping) {
+            if (isLooping) {
+                elapsedTime = 0;
+                playAudio();
+                addLog('Looping audio.');
+            } else {
                 pauseAudio();
                 addLog('Audio playback ended.');
-            } else {
-                elapsedTime = 0;  // Reset elapsed time for looping
-                playAudio();  // Restart audio for loop
-                addLog('Looping audio.');
             }
         };
 
@@ -113,40 +109,49 @@ document.addEventListener('DOMContentLoaded', () => {
         addLog('Audio started from position: ' + elapsedTime);
     }
 
-    // Pause audio without resetting
     function pauseAudio() {
         if (source) {
             source.stop();
             isPlaying = false;
-            pauseTime = audioContext.currentTime - startTime; // Save current position
-            elapsedTime = pauseTime;
+            elapsedTime = audioContext.currentTime - startTime;
             playButton.style.border = "1px solid black"; // Reset play button border
             stopButton.style.border = "2px solid #ff0000"; // Red border for paused
             addLog('Audio paused at position: ' + elapsedTime);
+            addLog('Seek bar position on pause: ' + seekBar.value);
         }
     }
 
-    // Stop audio and reset to start
     stopButton.addEventListener('click', () => {
-        if (source && isPlaying) {
+        if (source) {
             source.stop();
             isPlaying = false;
-            elapsedTime = 0;
-            seekBar.value = 0;
+            elapsedTime = audioContext.currentTime - startTime; // Save current position
+            isLooping = false; // Stop looping when stopped
+            loopButton.style.border = "1px solid black"; // Reset loop button border
+            seekBar.value = elapsedTime; // Update seek bar to current position
             playButton.style.border = "1px solid black"; // Reset play button border
             stopButton.style.border = "2px solid #ff0000"; // Red border for stopped
-            addLog('Audio stopped.');
+            addLog('Audio stopped at position: ' + elapsedTime);
         } else {
             addLog('No audio is currently playing to stop.');
         }
     });
 
-    // Loop audio
+    zeroButton.addEventListener('click', () => {
+        if (audioBuffer) {
+            elapsedTime = 0; // Reset elapsed time
+            seekBar.value = 0; // Reset seek bar to start
+            isPlaying = false;
+            playButton.style.border = "1px solid black"; // Reset play button border
+            stopButton.style.border = "1px solid black"; // Reset stop button border
+            loopButton.style.border = "1px solid black"; // Reset loop button border
+            addLog('Audio reset to start without playing.');
+        }
+    });
+
     loopButton.addEventListener('click', () => {
         if (audioBuffer && audioContext) {
             isLooping = !isLooping;
-            if (source) source.loop = isLooping;  // Update source loop state
-
             loopButton.style.border = isLooping ? "2px solid #f4d30c" : "1px solid black";
             addLog('Looping set to: ' + isLooping);
         } else {
@@ -154,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Update the seek bar and time display
     function updateSeekBar() {
         if (isPlaying && !isSeeking) {
             elapsedTime = audioContext.currentTime - startTime;
@@ -165,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Seek bar interaction
     seekBar.addEventListener('input', (e) => {
         if (audioBuffer && audioContext) {
             isSeeking = true;
@@ -186,14 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Format time for display
     function formatTime(seconds) {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = Math.floor(seconds % 60);
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     }
 
-    // JSON export functionality
     jsonButton.addEventListener('click', () => {
         const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
