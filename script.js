@@ -13,8 +13,8 @@ const elements = {
     seekBar: document.getElementById('seekBar'),
     jsonButton: document.querySelector('.json'),
     zeroButton: document.querySelector('.zero'),
-    meterDisplay: document.querySelector('.meter'),  // <-- Add a comma here
-    toggleDelayButton: document.getElementById('toggleDelay')  // <-- Correct placement
+    meterDisplay: document.querySelector('.meter'),
+    toggleDelayButton: document.getElementById('toggleDelay')
 };
 
 // --- Initializations ---
@@ -31,7 +31,7 @@ const audioApp = {
     elapsedTime: 0,
     isSeeking: false,
     isLooping: false,
-    isDelayOn: true,  // Initialize delay state
+    isDelayOn: false,  // Initialize delay state to "off"
 
     initializeAudioContext() {
         if (!this.context) {
@@ -53,9 +53,9 @@ const audioApp = {
             this.feedbackGainNode.connect(this.delayNode);
 
             elements.onButton.style.border = "2px solid #56a82f";
-            audioApp.log('Audio context initialized with basic reverb.');
+            this.log('Audio context initialized with basic reverb.');
         } else {
-            audioApp.log('Audio context already initialized.');
+            this.log('Audio context already initialized.');
         }
     },
 
@@ -66,7 +66,7 @@ const audioApp = {
                 this.buffer = buffer;
                 elements.seekBar.max = buffer.duration;
                 this.updateSeekBar();
-                audioApp.log('Audio file loaded and decoded.');
+                this.log('Audio file loaded and decoded.');
             });
         };
         reader.readAsArrayBuffer(file);
@@ -82,9 +82,9 @@ const audioApp = {
         if (this.isPlaying && !this.isSeeking) {
             this.elapsedTime = this.context.currentTime - this.startTime;
             elements.seekBar.value = this.elapsedTime;
-            elements.timeDisplay.textContent = `time: ${audioApp.formatTime(this.elapsedTime)} / ${audioApp.formatTime(this.buffer.duration)}`;
-            requestAnimationFrame(() => audioApp.updateSeekBar());
-            audioApp.log('Seek bar updated: ' + this.elapsedTime);
+            elements.timeDisplay.textContent = `time: ${this.formatTime(this.elapsedTime)} / ${this.formatTime(this.buffer.duration)}`;
+            requestAnimationFrame(() => this.updateSeekBar());
+            this.log('Seek bar updated: ' + this.elapsedTime);
         }
     },
 
@@ -100,7 +100,11 @@ const audioApp = {
         this.source.buffer = this.buffer;
 
         // Connect nodes for reverb and gain
-        this.source.connect(this.delayNode).connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+        if (this.isDelayOn) {
+            this.source.connect(this.delayNode).connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+        } else {
+            this.source.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+        }
 
         this.source.loop = false;  // Loop handled manually
 
@@ -111,29 +115,41 @@ const audioApp = {
         this.source.onended = () => {
             if (this.isLooping) {
                 this.elapsedTime = 0;  // Reset elapsed time for looping
-                audioApp.playAudio();  // Restart audio for loop
-                audioApp.log('Looping audio.');
+                this.playAudio();  // Restart audio for loop
+                this.log('Looping audio.');
             } else {
-                audioApp.pauseAudio(); // Pause instead of resetting
-                audioApp.log('Audio playback ended.');
+                this.pauseAudio(); // Pause instead of resetting
+                this.log('Audio playback ended.');
             }
         };
 
         this.updateSeekBar();
         this.drawMeter();
-        audioApp.log('Audio started from position: ' + this.elapsedTime);
+        this.log('Audio started from position: ' + this.elapsedTime);
     },
 
-    toggleDelay() {  // <-- Add toggleDelay function here
+    toggleDelay() {
+        if (!this.source) {
+            this.log('Cannot toggle delay: audio source is not initialized.');
+            return;
+        }
+
         if (this.isDelayOn) {
             this.source.disconnect();
             this.source.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
-            audioApp.log('Delay effect turned off.');
+            elements.toggleDelayButton.style.backgroundColor = '#617068'; // Off state color
+            elements.toggleDelayButton.textContent = 'off'; // Update button text to "off"
+            elements.toggleDelayButton.style.color = '#efefe6'; // Text color for dark background
+            this.log('Delay effect turned off.');
         } else {
             this.source.disconnect();
             this.source.connect(this.delayNode).connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
-            audioApp.log('Delay effect turned on.');
+            elements.toggleDelayButton.style.backgroundColor = '#c5d8d6'; // On state color
+            elements.toggleDelayButton.textContent = 'on'; // Update button text to "on"
+            elements.toggleDelayButton.style.color = '#000000'; // Text color for light background
+            this.log('Delay effect turned on.');
         }
+
         this.isDelayOn = !this.isDelayOn; // Toggle state
     },
 
@@ -144,8 +160,8 @@ const audioApp = {
             this.elapsedTime = this.context.currentTime - this.startTime; // Save current position
             elements.playButton.style.border = "1px solid black"; // Reset play button border
             elements.stopButton.style.border = "2px solid #ff0000"; // Red border for paused
-            audioApp.log('Audio paused at position: ' + this.elapsedTime);
-            audioApp.log('Seek bar position on pause: ' + elements.seekBar.value);
+            this.log('Audio paused at position: ' + this.elapsedTime);
+            this.log('Seek bar position on pause: ' + elements.seekBar.value);
         }
     },
 
@@ -158,9 +174,9 @@ const audioApp = {
             elements.seekBar.value = this.elapsedTime; // Update seek bar to current position
             elements.playButton.style.border = "1px solid black"; // Reset play button border
             elements.stopButton.style.border = "2px solid #ff0000"; // Red border for stopped
-            audioApp.log('Audio stopped at position: ' + this.elapsedTime);
+            this.log('Audio stopped at position: ' + this.elapsedTime);
         } else {
-            audioApp.log('No audio is currently playing to stop.');
+            this.log('No audio is currently playing to stop.');
         }
     },
 
@@ -190,7 +206,6 @@ const audioApp = {
 
         draw();
     }
-
 };
 
 // --- Event Listeners ---
@@ -226,8 +241,7 @@ elements.loopButton.addEventListener('click', () => {
         audioApp.log('No audio buffer or context to loop.');
     }
 });
-
-elements.toggleDelayButton.addEventListener('click', () => audioApp.toggleDelay());  // <-- Add this line
+elements.toggleDelayButton.addEventListener('click', () => audioApp.toggleDelay());
 
 // --- End of Script Execution ---
 elements.jsonButton.addEventListener('click', () => {
