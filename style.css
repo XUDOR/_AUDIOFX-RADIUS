@@ -244,6 +244,20 @@ input[type="range"]::-webkit-slider-thumb:active {
   font-weight: lighter;
 }
 
+.effectControl {
+  margin: 10px 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+
 
 #toggleDelay {
   appearance: none;
@@ -261,7 +275,7 @@ input[type="range"]::-webkit-slider-thumb:active {
     background-color: #d1d6c5; /* Hover state */
     border: 2px solid #55661f;
   }
-  
+
   &:active {
     background-color: #f4f4ea; /* Active state */
   }
