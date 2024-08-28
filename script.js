@@ -363,6 +363,20 @@ elements.fileInput.addEventListener('change', (event) => {
     }
 });
 
+
+// Ensure this is part of your event listeners section in the JS file
+
+elements.zeroButton.addEventListener('click', () => {
+    // Reset parameters or any other intended actions for the Zero button
+    audioApp.elapsedTime = 0; // Reset elapsed time
+    elements.seekBar.value = 0; // Reset seek bar to the start
+    elements.timeDisplay.textContent = 'time: 0:00 / 0:00'; // Reset time display
+    
+    console.log('Zero button clicked: reset parameters.');
+    audioApp.log('Zero button clicked: reset parameters.');
+});
+
+
 elements.playButton.addEventListener('click', () => {
     if (audioApp.buffer && audioApp.context) {
         if (!audioApp.isPlaying) {
@@ -389,6 +403,10 @@ elements.loopButton.addEventListener('click', () => {
         audioApp.log('No audio buffer or context to loop.');
     }
 });
+
+
+
+
 
 elements.toggleDelayButton.addEventListener('click', () => audioApp.toggleDelay());
 
