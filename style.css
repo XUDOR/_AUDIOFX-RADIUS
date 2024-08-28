@@ -55,9 +55,17 @@ button {
   cursor: pointer;
   width: 40px;
   height: 40px;
+
+  &:hover {
+    background-color: #d1d6c5;
+    border: 2px solid #55661f;
+
 }
 
-#on {
+
+}
+
+#on { 
   height: 50px;
   width: 50px;
   background-color: white;
@@ -236,29 +244,29 @@ input[type="range"]::-webkit-slider-thumb:active {
   font-weight: lighter;
 }
 
-/* Styles for the toggle delay button with hover effect */
+
 #toggleDelay {
-  -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
   margin: 5px;
   padding: 3px;
   font-size: 0.9em;
-  background-color: #e0e0e0;
+  background-color: #e0e0e0; /* Default color */
   border: 1px solid black;
   cursor: pointer;
   width: 40px;
   height: 40px;
+  transition: background-color 0.3s; /* Smooth transition */
 
   &:hover {
-    background-color: #d1d6c5;  /* Change color on hover */
+    background-color: #d1d6c5; /* Hover state */
     border: 2px solid #55661f;
   }
-
+  
   &:active {
-    background-color: #f4f4ea;  /* Change color on active */
+    background-color: #f4f4ea; /* Active state */
   }
 }
+
 
 /* ==========================RESPONSIVE===================================== */
 
