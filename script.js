@@ -17,8 +17,90 @@ const elements = {
     toggleDelayButton: document.getElementById('toggleDelay'),
     xyPad: document.getElementById('xyPad'),
     delayTimeControl: document.getElementById('delayTime'),
-    feedbackControl: document.getElementById('feedbackControl')
+    feedbackControl: document.getElementById('feedbackControl'),
+
+    // Updated toolbar elements with IDs
+    tDisplay: document.getElementById('display-t'),
+    fDisplay: document.getElementById('display-f'),
+    xDisplay: document.getElementById('display-x'),
+    yDisplay: document.getElementById('display-y'),
+    wetDisplay: document.getElementById('display-wet'),
+    dryDisplay: document.getElementById('display-dry')
 };
+
+// --- Functions to Update and Log Values ---
+function updateDelayAndFeedback() {
+    const delayTime = parseFloat(elements.delayTimeControl.value).toFixed(3);
+    const feedback = (parseFloat(elements.feedbackControl.value) * 100).toFixed(2);
+
+    elements.tDisplay.textContent = `t: ${delayTime} ms`;
+    elements.fDisplay.textContent = `f: ${feedback}%`;
+
+    console.log(`Delay Time (t): ${delayTime} ms`);
+    console.log(`Feedback (f): ${feedback}%`);
+}
+
+function updateXYValues(x, y) {
+    elements.xDisplay.textContent = `x: ${x.toFixed(3)}`;
+    elements.yDisplay.textContent = `y: ${y.toFixed(3)}`;
+
+    console.log(`Wet/Dry Mix (x): ${x.toFixed(3)}, (y): ${y.toFixed(3)}`);
+}
+
+// --- XY Pad Initialization ---
+document.addEventListener('DOMContentLoaded', (event) => {
+    const svg = document.getElementById('xy-controller');
+    const handle = document.getElementById('handle');
+
+    const updateMix = (x, y) => {
+        const wetLevel = (x / 100).toFixed(3);
+        const dryLevel = (1 - x / 100).toFixed(3);
+
+        // Update UI display for XY values
+        elements.xDisplay.textContent = `x: ${wetLevel}`;
+        elements.yDisplay.textContent = `y: ${dryLevel}`;
+        elements.wetDisplay.textContent = `wet: ${(wetLevel * 100).toFixed(2)}%`;
+        elements.dryDisplay.textContent = `dry: ${(dryLevel * 100).toFixed(2)}%`;
+        console.log(`Wet/Dry Mix (x): ${wetLevel}, (y): ${dryLevel}`);
+
+        // Update gains if nodes are initialized
+        if (audioApp.wetGainNode && audioApp.dryGainNode) {
+            audioApp.wetGainNode.gain.value = parseFloat(wetLevel);
+            audioApp.dryGainNode.gain.value = parseFloat(dryLevel);
+        }
+    };
+
+    const moveHandle = (event) => {
+        const rect = svg.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 100;
+        const y = 100 - ((event.clientY - rect.top) / rect.height) * 100; // Invert y-coordinate
+
+        handle.setAttribute('cx', x);
+        handle.setAttribute('cy', 100 - y); // Adjust for inverted y-coordinate
+
+        updateMix(x, y); // Update mix levels and display/log values
+    };
+
+    svg.addEventListener('mousemove', (event) => {
+        if (event.buttons === 1) {
+            moveHandle(event);
+        }
+    });
+
+    svg.addEventListener('click', (event) => {
+        moveHandle(event);
+    });
+});
+
+// --- Event Listeners for Input Controls ---
+elements.delayTimeControl.addEventListener('input', (event) => {
+    updateDelayAndFeedback(); // Always update the display
+});
+
+elements.feedbackControl.addEventListener('input', (event) => {
+    updateDelayAndFeedback(); // Always update the display
+});
+
 
 // --- Initializations ---
 const audioApp = {
@@ -255,7 +337,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         handle.setAttribute('cx', x);
         handle.setAttribute('cy', 100 - y); // Adjust for inverted y-coordinate
 
-        updateMix(x, y);
+        updateMix(x, y); // Update mix levels and display/log values
     };
 
     // Event listeners for moving the handle on click and drag
@@ -270,6 +352,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 });
 
+
 // --- Event Listeners ---
 
 elements.onButton.addEventListener('click', () => audioApp.initializeAudioContext());
@@ -279,6 +362,7 @@ elements.fileInput.addEventListener('change', (event) => {
         audioApp.loadAudioFile(file);
     }
 });
+
 elements.playButton.addEventListener('click', () => {
     if (audioApp.buffer && audioApp.context) {
         if (!audioApp.isPlaying) {
@@ -294,6 +378,7 @@ elements.playButton.addEventListener('click', () => {
         audioApp.log('No audio buffer or audio context available.');
     }
 });
+
 elements.stopButton.addEventListener('click', () => audioApp.stopAudio());
 elements.loopButton.addEventListener('click', () => {
     if (audioApp.buffer && audioApp.context) {
@@ -304,16 +389,82 @@ elements.loopButton.addEventListener('click', () => {
         audioApp.log('No audio buffer or context to loop.');
     }
 });
+
 elements.toggleDelayButton.addEventListener('click', () => audioApp.toggleDelay());
+
+// Update UI regardless of initialization
 elements.delayTimeControl.addEventListener('input', (event) => {
-    audioApp.delayNode.delayTime.value = event.target.value / 1000; // Convert to seconds
-    elements.timeDisplay.textContent = `t: ${event.target.value} ms`;
-    audioApp.log(`Delay time set to: ${event.target.value} ms`);
+    const delayTime = event.target.value; // Get the delay time in milliseconds
+
+    // Update the UI display for delay time
+    elements.tDisplay.textContent = `t: ${parseFloat(delayTime).toFixed(3)} ms`;
+    console.log(`Delay Time (t): ${parseFloat(delayTime).toFixed(3)} ms`);
+
+    // If delay node is initialized, update it
+    if (audioApp.delayNode) {
+        audioApp.delayNode.delayTime.value = delayTime / 1000; // Convert to seconds
+    }
 });
+
 elements.feedbackControl.addEventListener('input', (event) => {
-    audioApp.feedbackGainNode.gain.value = event.target.value;
-    elements.timeDisplay.textContent = `f: ${(event.target.value * 100).toFixed(0)}%`;
-    audioApp.log(`Feedback set to: ${event.target.value * 100}%`);
+    const feedback = event.target.value; // Get the feedback percentage
+
+    // Update the UI display for feedback
+    elements.fDisplay.textContent = `f: ${(parseFloat(feedback) * 100).toFixed(2)}%`;
+    console.log(`Feedback (f): ${(parseFloat(feedback) * 100).toFixed(2)}%`);
+
+    // If feedback gain node is initialized, update it
+    if (audioApp.feedbackGainNode) {
+        audioApp.feedbackGainNode.gain.value = parseFloat(feedback);
+    }
+});
+
+// --- XY Pad Initialization ---
+document.addEventListener('DOMContentLoaded', (event) => {
+    const svg = document.getElementById('xy-controller');
+    const handle = document.getElementById('handle');
+    const valueX = document.getElementById('value-x');
+    const valueY = document.getElementById('value-y');
+
+    // Function to update the wet/dry mix based on XY pad position
+    const updateMix = (x, y) => {
+        const wetLevel = x / 100;
+        const dryLevel = 1 - wetLevel;
+
+        // Update UI display for XY values
+        elements.xDisplay.textContent = `x: ${wetLevel.toFixed(3)}`;
+        elements.yDisplay.textContent = `y: ${dryLevel.toFixed(3)}`;
+        console.log(`Wet/Dry Mix (x): ${wetLevel.toFixed(3)}, (y): ${dryLevel.toFixed(3)}`);
+
+        // If nodes are initialized, update them
+        if (audioApp.wetGainNode && audioApp.dryGainNode) {
+            audioApp.wetGainNode.gain.value = wetLevel;
+            audioApp.dryGainNode.gain.value = dryLevel;
+        }
+    };
+
+    // Function to move the handle on the XY pad
+    const moveHandle = (event) => {
+        const rect = svg.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 100;
+        const y = 100 - ((event.clientY - rect.top) / rect.height) * 100; // Invert y-coordinate
+
+        handle.setAttribute('cx', x);
+        handle.setAttribute('cy', 100 - y); // Adjust for inverted y-coordinate
+
+        updateMix(x, y); // Update mix levels and display/log values
+    };
+
+    // Event listeners for moving the handle on click and drag
+    svg.addEventListener('mousemove', (event) => {
+        if (event.buttons === 1) {
+            moveHandle(event);
+        }
+    });
+
+    svg.addEventListener('click', (event) => {
+        moveHandle(event);
+    });
 });
 
 // --- End of Script Execution ---
@@ -327,3 +478,4 @@ elements.jsonButton.addEventListener('click', () => {
     URL.revokeObjectURL(url);
     audioApp.log('Logs exported as JSON.');
 });
+
