@@ -232,16 +232,38 @@ input[type="range"]::-webkit-slider-thumb:active {
 
 .effectContainer {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: wrap;
   margin: 5px;
   padding: 5px;
   border: 1px solid black;
-  height: 200px;
-  width: 200px;
+  max-height: 370px;
+  max-width: 370px;
   text-align: left;
   font-size: .9em;
   font-weight: lighter;
+}
+
+.delayToolbar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid black;
+  margin: 2px;
+  padding: 2px;
+  gap: 3px;
+  font-size: 0.9em;
+
+
+}
+
+.Disp {
+  width: 40px;
+  height: 40px;
+  border: 1px solid black;
+
 }
 
 .effectControl {
@@ -280,6 +302,50 @@ input[type="range"] {
     background-color: #f4f4ea; /* Active state */
   }
 }
+
+#xyPadContainer {
+  border:  1px solid gray;
+  font-size: 0.9em;
+  margin: 3px;
+
+
+}
+
+.XYcontainer {
+  border: 3px solid #065a82;
+  width: 200px;
+  height: 200px;
+}
+
+#xy-controller rect {
+  fill: #e0f7fa;
+}
+
+#xy-controller circle {
+  fill: #3c4745;
+  cursor: pointer;
+}
+
+.value-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 5px;
+}
+
+.value-container div {
+  margin-bottom: 5px;
+}
+
+
+.DelayCont {
+  display: flex;
+  flex-direction: row;
+  border:  1px solid gray;
+  
+
+}
+
+
 
 
 /* ==========================RESPONSIVE===================================== */
