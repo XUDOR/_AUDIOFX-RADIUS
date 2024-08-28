@@ -61,9 +61,8 @@ button {
     border: 2px solid #55661f;
 
 }
-
-
 }
+
 
 #on { 
   height: 50px;
@@ -124,6 +123,7 @@ input[type="range"] {
   margin-top: 10px;
 }
 
+
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -174,6 +174,11 @@ input[type="range"]::-webkit-slider-thumb:active {
   font-size: .8em;
   padding: 5px;
 }
+
+#seekBar {
+  width: 150px;
+}
+
 
 .meterCont {
   margin: 3px;
@@ -237,8 +242,8 @@ input[type="range"]::-webkit-slider-thumb:active {
   margin: 5px;
   padding: 5px;
   border: 1px solid black;
-  max-height: 370px;
-  max-width: 370px;
+  max-height: 450px;
+  max-width: 450px;
   text-align: left;
   font-size: .9em;
   font-weight: lighter;
@@ -246,7 +251,7 @@ input[type="range"]::-webkit-slider-thumb:active {
 
 .delayToolbar {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
@@ -255,16 +260,39 @@ input[type="range"]::-webkit-slider-thumb:active {
   padding: 2px;
   gap: 3px;
   font-size: 0.9em;
-
-
 }
 
 .Disp {
-  width: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 60px;
+  height: 30px;
+  border: 1px solid black;
+  padding: 3px;
+}
+
+.Disp-t {
+  display: flex;
+  flex-wrap: wrap;
+  width: 60px;
   height: 40px;
   border: 1px solid black;
-
+  padding: 4px;
 }
+
+
+.Disp-f {
+  display: flex;
+  flex-wrap: wrap;
+  width: 60px;
+  height: 20px;
+  border: 1px solid black;
+  padding: 3px;
+}
+
+
+
+
 
 .effectControl {
   margin: 10px 0;
@@ -313,8 +341,8 @@ input[type="range"] {
 
 .XYcontainer {
   border: 3px solid #065a82;
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
 }
 
 #xy-controller rect {
@@ -337,10 +365,22 @@ input[type="range"] {
 }
 
 
+#delayTime, #feedbackControl 
+{
+  margin-top: 5px;
+  height: 20px;
+  width: 170px;
+}
+
 .DelayCont {
   display: flex;
   flex-direction: row;
   border:  1px solid gray;
+  font-size: 0.9em;
+  padding: 3px;
+  margin: 2px;
+  width: 100%;
+  height: 60px;
   
 
 }
@@ -360,66 +400,30 @@ input[type="range"] {
     width: 100%;
     justify-content: center; /* Center controls */
   }
+
+  .delayToolbar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid black;
+    margin: 2px;
+    padding: 2px;
+    gap: 3px;
+    font-size: 0.9em;
+  }
+
+  #controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+    background-color: white;
+    width: 100%; /* Added width to make it responsive */
+  }
 }
 
-.title {
-  border: 3px solid gray;
-  padding: 10px;
-  font-size: 1em;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-}
 
-#controls {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 5px;
-  padding: 10px;
-  background-color: white;
-  width: 100%; /* Added width to make it responsive */
-}
 
-button,
-input[type="file"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  padding: 3px;
-  font-size: 0.7em;
-  background-color: #e0e0e0;
-  border: 1px solid black;
-  cursor: pointer;
-}
-
-input[type="range"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  width: 100px;
-  border: 1px solid black;
-  background-color: lightgray;
-}
-
-button:hover,
-input[type="file"]:hover,
-input[type="range"]::-webkit-slider-thumb:hover {
-  background-color: #d0d0d0;
-}
-
-button:active,
-input[type="file"]:active,
-input[type="range"]::-webkit-slider-thumb:active {
-  background-color: #c0c0c0;
-}
-
-.time {
-  border: 1px solid black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: left;
-  font-size: .8em;
-  padding: 5px;
-}
