@@ -36,8 +36,14 @@
     
     <main>
         <div class="effectContainer">
-            Delay
-            <button id="toggleDelay">on</button>
+            <div class="effectControl">
+                <label for="toggleDelay">Delay:</label>
+                <button id="toggleDelay">off</button>
+            </div>
+            <div class="effectControl">
+                <label for="wetDry">Wet/Dry Mix</label>
+                <input type="range" id="wetDry" min="0" max="1" step="0.01" value="0">
+            </div>
         </div>
         
     </main>
