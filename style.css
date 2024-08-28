@@ -403,7 +403,7 @@ input[type="range"] {
 
   .delayToolbar {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
