@@ -15,7 +15,9 @@ const elements = {
     zeroButton: document.querySelector('.zero'),
     meterDisplay: document.querySelector('.meter'),
     toggleDelayButton: document.getElementById('toggleDelay'),
-    wetDryControl: document.getElementById('wetDry')  // Wet/Dry control slider
+    xyPad: document.getElementById('xyPad'),
+    delayTimeControl: document.getElementById('delayTime'),
+    feedbackControl: document.getElementById('feedbackControl')
 };
 
 // --- Initializations ---
@@ -34,7 +36,7 @@ const audioApp = {
     elapsedTime: 0,
     isSeeking: false,
     isLooping: false,
-    isDelayOn: false,  // Initialize delay state to "off"
+    isDelayOn: false,
 
     initializeAudioContext() {
         if (!this.context) {
@@ -46,20 +48,24 @@ const audioApp = {
 
             // Initialize Delay and Feedback Gain Nodes for Reverb
             this.delayNode = this.context.createDelay(5.0);
-            this.delayNode.delayTime.value = 0.5; // 500ms delay
+            this.delayNode.delayTime.value = 0.5; // Default 500ms delay
 
             this.feedbackGainNode = this.context.createGain();
-            this.feedbackGainNode.gain.value = 0.5; // Set feedback amount
+            this.feedbackGainNode.gain.value = 0.5; // Default 50% feedback
 
-            // Initialize Wet/Dry Gain Nodes
+            // Initialize wet/dry gain nodes
             this.wetGainNode = this.context.createGain();
             this.dryGainNode = this.context.createGain();
-            this.dryGainNode.gain.value = 1; // Full dry signal
-            this.wetGainNode.gain.value = 0; // No wet signal
+            this.wetGainNode.gain.value = 0.5; // Default 50% wet
+            this.dryGainNode.gain.value = 0.5; // Default 50% dry
 
-            // Connect feedback loop for reverb effect
+            // Connect feedback loop for delay effect
             this.delayNode.connect(this.feedbackGainNode);
             this.feedbackGainNode.connect(this.delayNode);
+
+            // Connect to output
+            this.dryGainNode.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+            this.wetGainNode.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
 
             elements.onButton.style.border = "2px solid #56a82f";
             this.log('Audio context initialized with basic reverb.');
@@ -110,10 +116,9 @@ const audioApp = {
 
         // Connect nodes for reverb and gain
         if (this.isDelayOn) {
-            this.source.connect(this.dryGainNode).connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
-            this.source.connect(this.delayNode).connect(this.wetGainNode).connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+            this.source.connect(this.delayNode).connect(this.wetGainNode);
         } else {
-            this.source.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+            this.source.connect(this.dryGainNode);
         }
 
         this.source.loop = false;  // Loop handled manually
@@ -146,14 +151,14 @@ const audioApp = {
 
         if (this.isDelayOn) {
             this.source.disconnect();
-            this.source.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+            this.source.connect(this.dryGainNode);
             elements.toggleDelayButton.style.backgroundColor = '#617068'; // Off state color
             elements.toggleDelayButton.textContent = 'off'; // Update button text to "off"
             elements.toggleDelayButton.style.color = '#efefe6'; // Text color for dark background
             this.log('Delay effect turned off.');
         } else {
             this.source.disconnect();
-            this.source.connect(this.delayNode).connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+            this.source.connect(this.delayNode).connect(this.wetGainNode);
             elements.toggleDelayButton.style.backgroundColor = '#c5d8d6'; // On state color
             elements.toggleDelayButton.textContent = 'on'; // Update button text to "on"
             elements.toggleDelayButton.style.color = '#000000'; // Text color for light background
@@ -190,17 +195,6 @@ const audioApp = {
         }
     },
 
-    resetAudio() {
-        if (this.source) {
-            this.source.stop();
-            this.isPlaying = false;
-            this.elapsedTime = 0; // Reset elapsed time to zero
-            elements.seekBar.value = 0; // Reset seek bar to zero
-            elements.timeDisplay.textContent = `time: ${this.formatTime(this.elapsedTime)} / ${this.formatTime(this.buffer.duration)}`;
-            this.log('Audio reset to the beginning.');
-        }
-    },
-
     drawMeter() {
         const bufferLength = this.analyserNode.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
@@ -229,7 +223,55 @@ const audioApp = {
     }
 };
 
+// --- XY Pad Initialization ---
+document.addEventListener('DOMContentLoaded', (event) => {
+    const svg = document.getElementById('xy-controller');
+    const handle = document.getElementById('handle');
+    const valueX = document.getElementById('value-x');
+    const valueY = document.getElementById('value-y');
+    const wetGainNode = audioApp.wetGainNode;
+    const dryGainNode = audioApp.dryGainNode;
+
+    // Function to update the wet/dry mix based on XY pad position
+    const updateMix = (x, y) => {
+        const wetLevel = x / 100;
+        const dryLevel = 1 - wetLevel;
+
+        if (wetGainNode && dryGainNode) {
+            wetGainNode.gain.value = wetLevel;
+            dryGainNode.gain.value = dryLevel;
+            valueX.textContent = `x: ${wetLevel.toFixed(2)}`;
+            valueY.textContent = `y: ${dryLevel.toFixed(2)}`;
+            audioApp.log(`Wet: ${wetLevel.toFixed(2)}, Dry: ${dryLevel.toFixed(2)}`);
+        }
+    };
+
+    // Function to move the handle on the XY pad
+    const moveHandle = (event) => {
+        const rect = svg.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 100;
+        const y = 100 - ((event.clientY - rect.top) / rect.height) * 100; // Invert y-coordinate
+
+        handle.setAttribute('cx', x);
+        handle.setAttribute('cy', 100 - y); // Adjust for inverted y-coordinate
+
+        updateMix(x, y);
+    };
+
+    // Event listeners for moving the handle on click and drag
+    svg.addEventListener('mousemove', (event) => {
+        if (event.buttons === 1) {
+            moveHandle(event);
+        }
+    });
+
+    svg.addEventListener('click', (event) => {
+        moveHandle(event);
+    });
+});
+
 // --- Event Listeners ---
+
 elements.onButton.addEventListener('click', () => audioApp.initializeAudioContext());
 elements.fileInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
@@ -263,7 +305,16 @@ elements.loopButton.addEventListener('click', () => {
     }
 });
 elements.toggleDelayButton.addEventListener('click', () => audioApp.toggleDelay());
-elements.zeroButton.addEventListener('click', () => audioApp.resetAudio());
+elements.delayTimeControl.addEventListener('input', (event) => {
+    audioApp.delayNode.delayTime.value = event.target.value / 1000; // Convert to seconds
+    elements.timeDisplay.textContent = `t: ${event.target.value} ms`;
+    audioApp.log(`Delay time set to: ${event.target.value} ms`);
+});
+elements.feedbackControl.addEventListener('input', (event) => {
+    audioApp.feedbackGainNode.gain.value = event.target.value;
+    elements.timeDisplay.textContent = `f: ${(event.target.value * 100).toFixed(0)}%`;
+    audioApp.log(`Feedback set to: ${event.target.value * 100}%`);
+});
 
 // --- End of Script Execution ---
 elements.jsonButton.addEventListener('click', () => {
