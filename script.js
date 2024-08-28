@@ -14,7 +14,8 @@ const elements = {
     jsonButton: document.querySelector('.json'),
     zeroButton: document.querySelector('.zero'),
     meterDisplay: document.querySelector('.meter'),
-    toggleDelayButton: document.getElementById('toggleDelay')
+    toggleDelayButton: document.getElementById('toggleDelay'),
+    wetDryControl: document.getElementById('wetDry')  // Wet/Dry control slider
 };
 
 // --- Initializations ---
@@ -26,6 +27,8 @@ const audioApp = {
     delayNode: null,
     feedbackGainNode: null,
     analyserNode: null,
+    wetGainNode: null,
+    dryGainNode: null,
     isPlaying: false,
     startTime: 0,
     elapsedTime: 0,
@@ -47,6 +50,12 @@ const audioApp = {
 
             this.feedbackGainNode = this.context.createGain();
             this.feedbackGainNode.gain.value = 0.5; // Set feedback amount
+
+            // Initialize Wet/Dry Gain Nodes
+            this.wetGainNode = this.context.createGain();
+            this.dryGainNode = this.context.createGain();
+            this.dryGainNode.gain.value = 1; // Full dry signal
+            this.wetGainNode.gain.value = 0; // No wet signal
 
             // Connect feedback loop for reverb effect
             this.delayNode.connect(this.feedbackGainNode);
@@ -101,7 +110,8 @@ const audioApp = {
 
         // Connect nodes for reverb and gain
         if (this.isDelayOn) {
-            this.source.connect(this.delayNode).connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+            this.source.connect(this.dryGainNode).connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+            this.source.connect(this.delayNode).connect(this.wetGainNode).connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
         } else {
             this.source.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
         }
@@ -180,6 +190,17 @@ const audioApp = {
         }
     },
 
+    resetAudio() {
+        if (this.source) {
+            this.source.stop();
+            this.isPlaying = false;
+            this.elapsedTime = 0; // Reset elapsed time to zero
+            elements.seekBar.value = 0; // Reset seek bar to zero
+            elements.timeDisplay.textContent = `time: ${this.formatTime(this.elapsedTime)} / ${this.formatTime(this.buffer.duration)}`;
+            this.log('Audio reset to the beginning.');
+        }
+    },
+
     drawMeter() {
         const bufferLength = this.analyserNode.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
@@ -242,6 +263,7 @@ elements.loopButton.addEventListener('click', () => {
     }
 });
 elements.toggleDelayButton.addEventListener('click', () => audioApp.toggleDelay());
+elements.zeroButton.addEventListener('click', () => audioApp.resetAudio());
 
 // --- End of Script Execution ---
 elements.jsonButton.addEventListener('click', () => {
