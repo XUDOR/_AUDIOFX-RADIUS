@@ -256,6 +256,26 @@ input[type="range"]::-webkit-slider-thumb:active {
   background-color: blue;
 }
 
+
+.console {
+  width: 100px;
+  height: 20px;
+  padding: 3px;
+  margin: 3px;
+  background-color: #efefe6;
+  color: #14467a;
+  align-items: center;
+  text-align: left;
+  font-size: .8em;
+  font-weight: lighter;
+  justify-content: center;
+  align-items: center;
+
+
+}
+
+
+
 /* ========================================MAIN===================================== */
 /* ========================================____===================================== */
 .effectContainer {
