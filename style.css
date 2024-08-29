@@ -96,6 +96,7 @@ input[type="file"] {
   background-color: #e0e0e0;
   border: 1px solid black;
   margin: 3px;
+  margin-top: 10px;
   cursor: pointer;
   height: 25px;
   display: flex;
