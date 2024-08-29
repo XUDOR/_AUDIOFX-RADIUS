@@ -357,11 +357,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 elements.onButton.addEventListener('click', () => audioApp.initializeAudioContext());
 elements.fileInput.addEventListener('change', (event) => {
+    if (!audioApp.context) {
+        alert("--> Please use the ON button to turn on Audio Function");
+        return;  // Stop further execution if the context is not initialized
+    }
+
     const file = event.target.files[0];
     if (file) {
         audioApp.loadAudioFile(file);
     }
 });
+
 
 
 // Ensure this is part of your event listeners section in the JS file
@@ -378,20 +384,27 @@ elements.zeroButton.addEventListener('click', () => {
 
 
 elements.playButton.addEventListener('click', () => {
-    if (audioApp.buffer && audioApp.context) {
-        if (!audioApp.isPlaying) {
-            audioApp.playAudio();
-            elements.playButton.style.border = "2px solid #007bff"; // Blue border for playing
-            elements.stopButton.style.border = "1px solid black"; // Reset stop button border
-            audioApp.log('Playing audio.');
-        } else {
-            audioApp.pauseAudio(); // Pause if currently playing
-            audioApp.log('Pausing audio.');
-        }
+    if (!audioApp.context) {
+        alert("--> Please use the ON button to turn on Audio Function");
+        return;
+    }
+
+    if (!audioApp.buffer) {
+        alert("--> Please load an audio file before pressing Play");
+        return;
+    }
+
+    if (!audioApp.isPlaying) {
+        audioApp.playAudio();
+        elements.playButton.style.border = "2px solid #007bff"; // Blue border for playing
+        elements.stopButton.style.border = "1px solid black"; // Reset stop button border
+        audioApp.log('Playing audio.');
     } else {
-        audioApp.log('No audio buffer or audio context available.');
+        audioApp.pauseAudio(); // Pause if currently playing
+        audioApp.log('Pausing audio.');
     }
 });
+
 
 elements.stopButton.addEventListener('click', () => audioApp.stopAudio());
 elements.loopButton.addEventListener('click', () => {
