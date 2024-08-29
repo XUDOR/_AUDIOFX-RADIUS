@@ -293,7 +293,7 @@ const audioApp = {
 
             // Update meter display
             elements.meterDisplay.style.width = `${fillWidth}px`;
-            elements.meterDisplay.style.height = '25px'; // Height of the meter
+            elements.meterDisplay.style.height = '30px'; // Height of the meter
             elements.meterDisplay.style.backgroundColor = '#79a31c'; // Solid green color for the meter
 
             if (this.isPlaying) {
