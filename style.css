@@ -7,7 +7,7 @@ body {
   height: 100vh;
   margin: 0;
   overflow-x: hidden;
-  overflow-y: hidden; /* Allow vertical scrolling if necessary */
+  overflow-y: hidden; 
 }
 
 header {
@@ -21,16 +21,19 @@ header {
 
 .headCont {
   display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between; 
+  width: 100%;
+  padding: 10px;
 }
 
 .svg-title {
-  width: auto; /* Default width to let it fit naturally */
-  height: 50px; /* Adjust the height as needed */
+  width: auto; 
+  height: 50px; 
   display: block;
-  margin: 10px; /* Adjust margin to your liking */
+  margin: 10px; 
 }
 
 #controls {
@@ -70,7 +73,6 @@ button {
 
   &:hover {
     background-color: #d1d6c5;
-    /* Change color on hover */
     border: 2px solid #55661f;
   }
 }
@@ -247,7 +249,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   padding: 5px;
   border: 1px solid black;
   max-height: 450px;
-  max-width: 100%; /* Make it responsive */
+  max-width: 100%; 
   text-align: left;
   font-size: .9em;
   font-weight: lighter;
@@ -284,7 +286,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   padding: 4px;
 }
 
-
 .Disp-f {
   display: flex;
   flex-wrap: wrap;
@@ -293,9 +294,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   border: 1px solid black;
   padding: 3px;
 }
-
-
-
 
 
 .effectControl {
@@ -311,8 +309,6 @@ input[type="range"] {
   width: 100%;
 }
 
-
-
 #toggleDelay {
   appearance: none;
   margin: 5px;
@@ -325,17 +321,16 @@ input[type="range"] {
   width: 40px;
   height: 40px;
   transition: background-color 0.3s;
-  /* Smooth transition */
+
 
   &:hover {
     background-color: #d1d6c5;
-    /* Hover state */
     border: 2px solid #55661f;
   }
 
   &:active {
     background-color: #f4f4ea;
-    /* Active state */
+
   }
 }
 
@@ -404,21 +399,17 @@ input[type="range"] {
   header {
     flex-direction: column;
     align-items: center;
-    /* Center align for better mobile appearance */
+   
   }
 
   .headCont {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    align-items: center;
+    align-items: flex-start;
   }
 
-  .title {
-    width: 100%;
-    text-align: center;
-    margin: 0; /* Remove margin to make it flush */
-  }
+
 
 
 
@@ -452,7 +443,7 @@ input[type="range"] {
     padding: 10px;
     background-color: white;
     width: 100%;
-    /* Added width to make it responsive */
+    
   }
 
   .effectContainer {
@@ -460,7 +451,17 @@ input[type="range"] {
     width: 100%;
     max-width: 100%;
     padding: 10px;
-    margin: 0 auto; /* Center the container */
+    margin: 0 auto; 
   }
+
+  #xyPadContainer {
+    border: 1px solid gray;
+    font-size: 0.9em;
+    margin: 3px;
+    
+  
+  }
+
+
 
 }
