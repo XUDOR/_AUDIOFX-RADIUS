@@ -6,6 +6,8 @@ body {
   flex-wrap: wrap;
   height: 100vh;
   margin: 0;
+  overflow-x: hidden;
+  overflow-y: hidden; /* Allow vertical scrolling if necessary */
 }
 
 header {
@@ -24,14 +26,11 @@ header {
   align-items: center;
 }
 
-.title {
+.svg-title {
+  width: auto; /* Default width to let it fit naturally */
+  height: 50px; /* Adjust the height as needed */
   display: block;
-  border: 1px solid gray;
-  padding: 10px;
-  margin: 10px;
-  font-size: 1em;
-  font-weight: lighter;
-  text-align: center;
+  margin: 10px; /* Adjust margin to your liking */
 }
 
 #controls {
@@ -40,7 +39,7 @@ header {
   flex-wrap: wrap;
   width: 100%;
   margin: 5px;
-  gap: 10px;
+  gap: 5px;
   background-color: white;
 }
 
@@ -60,17 +59,18 @@ button {
     background-color: #d1d6c5;
     border: 2px solid #55661f;
 
-}
+  }
 }
 
 
-#on { 
+#on {
   height: 50px;
   width: 50px;
   background-color: white;
 
   &:hover {
-    background-color: #d1d6c5;  /* Change color on hover */
+    background-color: #d1d6c5;
+    /* Change color on hover */
     border: 2px solid #55661f;
   }
 }
@@ -163,7 +163,7 @@ button:active,
 input[type="file"]:active,
 input[type="range"]::-webkit-slider-thumb:active {
   background-color: #f4f4ea;
-}       
+}
 
 .time {
   border: 1px solid black;
@@ -172,11 +172,15 @@ input[type="range"]::-webkit-slider-thumb:active {
   align-items: center;
   text-align: left;
   font-size: .8em;
-  padding: 5px;
+  padding: 1px;
+  margin: 2px;
+  height: 40px;
 }
 
 #seekBar {
   width: 150px;
+  height: 40px;
+  padding: 1px;
 }
 
 
@@ -243,7 +247,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   padding: 5px;
   border: 1px solid black;
   max-height: 450px;
-  max-width: 450px;
+  max-width: 100%; /* Make it responsive */
   text-align: left;
   font-size: .9em;
   font-weight: lighter;
@@ -314,25 +318,29 @@ input[type="range"] {
   margin: 5px;
   padding: 3px;
   font-size: 0.9em;
-  background-color: #e0e0e0; /* Default color */
+  background-color: #e0e0e0;
+  /* Default color */
   border: 1px solid black;
   cursor: pointer;
   width: 40px;
   height: 40px;
-  transition: background-color 0.3s; /* Smooth transition */
+  transition: background-color 0.3s;
+  /* Smooth transition */
 
   &:hover {
-    background-color: #d1d6c5; /* Hover state */
+    background-color: #d1d6c5;
+    /* Hover state */
     border: 2px solid #55661f;
   }
 
   &:active {
-    background-color: #f4f4ea; /* Active state */
+    background-color: #f4f4ea;
+    /* Active state */
   }
 }
 
 #xyPadContainer {
-  border:  1px solid gray;
+  border: 1px solid gray;
   font-size: 0.9em;
   margin: 3px;
 
@@ -365,8 +373,8 @@ input[type="range"] {
 }
 
 
-#delayTime, #feedbackControl 
-{
+#delayTime,
+#feedbackControl {
   margin-top: 5px;
   height: 20px;
   width: 170px;
@@ -375,13 +383,14 @@ input[type="range"] {
 .DelayCont {
   display: flex;
   flex-direction: row;
-  border:  1px solid gray;
+  flex-wrap: wrap;
+  border: 1px solid gray;
   font-size: 0.9em;
   padding: 3px;
   margin: 2px;
   width: 100%;
   height: 60px;
-  
+
 
 }
 
@@ -391,14 +400,35 @@ input[type="range"] {
 /* ==========================RESPONSIVE===================================== */
 
 @media (max-width: 768px) {
+  
   header {
     flex-direction: column;
-    align-items: center; /* Center align for better mobile appearance */
+    align-items: center;
+    /* Center align for better mobile appearance */
   }
 
-  #controls {
+  .headCont {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .title {
     width: 100%;
-    justify-content: center; /* Center controls */
+    text-align: center;
+    margin: 0; /* Remove margin to make it flush */
+  }
+
+
+
+  #controls {
+    #controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Adjust grid layout */
+      gap: 5px;
+      width: 100%;
+    }
   }
 
   .delayToolbar {
@@ -421,9 +451,16 @@ input[type="range"] {
     gap: 5px;
     padding: 10px;
     background-color: white;
-    width: 100%; /* Added width to make it responsive */
+    width: 100%;
+    /* Added width to make it responsive */
   }
+
+  .effectContainer {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    margin: 0 auto; /* Center the container */
+  }
+
 }
-
-
-
