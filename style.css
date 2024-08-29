@@ -14,6 +14,7 @@ header {
   margin: 5px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: start;
   margin-bottom: 5px;
   align-items: center;
@@ -24,7 +25,7 @@ header {
   flex-direction: column;
   flex-wrap: wrap;
   align-items: flex-start;
-  justify-content: space-between;
+
   width: 100%;
   padding: 10px;
 }
@@ -44,6 +45,18 @@ header {
   margin: 5px;
   gap: 5px;
   background-color: white;
+}
+
+
+#on {
+  height: 25px;
+  width: 25px;
+  margin: 3px;
+  background-color: white;
+  &:hover {
+    background-color: #d1d6c5;
+    border: 2px solid #55661f;
+  }
 }
 
 button {
@@ -66,17 +79,6 @@ button {
 }
 
 
-#on {
-  height: 50px;
-  width: 50px;
-  background-color: white;
-
-  &:hover {
-    background-color: #d1d6c5;
-    border: 2px solid #55661f;
-  }
-}
-
 .zero {
   border: 1px solid black;
   height: 40px;
@@ -93,7 +95,11 @@ input[type="file"] {
   font-size: 0.7em;
   background-color: #e0e0e0;
   border: 1px solid black;
+  margin: 3px;
   cursor: pointer;
+  height: 25px;
+  display: flex;
+
 }
 
 input[type="range"] {
@@ -101,8 +107,10 @@ input[type="range"] {
   -moz-appearance: none;
   appearance: none;
   width: 100px;
+  height: 10px;
   border: 1px solid black;
   background-color: lightgray;
+  margin: 3px;
 }
 
 .transport {
@@ -110,6 +118,26 @@ input[type="range"] {
   border: 2px solid #55661f;
   align-items: center;
 }
+
+.time {
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+  font-size: .8em;
+  padding: 1px;
+  margin: 2px;
+  height: 40px;
+}
+
+.VolSeekCont {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+}
+
 
 #volume-control {
   font-size: 0.7em;
@@ -167,24 +195,13 @@ input[type="range"]::-webkit-slider-thumb:active {
   background-color: #f4f4ea;
 }
 
-.time {
-  border: 1px solid black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: left;
-  font-size: .8em;
-  padding: 1px;
-  margin: 2px;
-  height: 40px;
-}
-
 #seekBar {
   width: 150px;
-  height: 40px;
+  height: 10px;
   padding: 1px;
-}
+  margin-top: 17px;
 
+}
 
 .meterCont {
   margin: 3px;
@@ -192,7 +209,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   display: flex;
   align-items: center;
   width: 100px;
-  height: 40px;
+  height: 30px;
   position: relative;
   overflow: hidden;
 }
@@ -201,7 +218,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   display: flex;
   align-items: center;
   width: 100px;
-  height: 40px;
+  height: 30px;
   background-color: #e0e0e0;
   position: relative;
   overflow: hidden;
@@ -242,13 +259,15 @@ input[type="range"]::-webkit-slider-thumb:active {
 /* ========================================MAIN===================================== */
 /* ========================================____===================================== */
 .effectContainer {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: start;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* Two columns of equal width */
+  grid-template-rows: auto;
+  /* Automatically adjust row height */
+  gap: 10px;
+  /* Space between grid items */
+  padding: 10px;
   margin: 5px;
-  padding: 5px;
   border: 1px solid black;
   max-height: 450px;
   max-width: 100%;
@@ -268,7 +287,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   padding: 2px;
   gap: 3px;
   font-size: 0.9em;
-  max-width: 100px;
+  max-width: 70px;
 }
 
 .Disp {
@@ -375,7 +394,7 @@ input[type="range"] {
 #delayTime,
 #feedbackControl {
   margin-top: 5px;
-  height: 20px;
+  height: 25px;
   width: 170px;
 }
 
@@ -401,39 +420,42 @@ input[type="range"] {
 @media (max-width: 768px) {
 
   body {
-
     overflow-x: hidden;
-    overflow-y: hidden;
   }
-
-
 
   header {
     flex-direction: column;
     align-items: center;
-
+    width: 100%;
   }
 
   .headCont {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
+
+    width: 100%;
+    /* Ensure header takes full width */
   }
 
 
-  #controls {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
 
-      gap: 5px;
-      width: 100%;
-    }
+  input[type="file"] {
+    width: 90%;
+
+  }
+
+
+  .delayToolbar,
+  #xyPadContainer,
+  .DelayCont {
+    width: 100%;
+    /* Make each section take full width */
+    max-width: 100%;
   }
 
   .delayToolbar {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
@@ -456,11 +478,15 @@ input[type="range"] {
   }
 
   .effectContainer {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    /* Single column on smaller screens */
+    grid-template-rows: auto;
+    /* Automatically adjust row height */
     width: 100%;
     max-width: 100%;
     padding: 10px;
     margin: 0 auto;
+    align-items: start;
   }
 
   #xyPadContainer {
@@ -468,9 +494,6 @@ input[type="range"] {
     font-size: 0.9em;
     margin: 3px;
     width: 100%;
-
-
   }
 
-
-
+}
