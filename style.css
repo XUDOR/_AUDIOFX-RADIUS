@@ -122,13 +122,17 @@ input[type="range"] {
 .time {
   border: 1px solid black;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: left;
+  align-items: self-start;
   text-align: left;
   font-size: .8em;
+  text-align: left;
   padding: 1px;
+  padding-left: 3px;
   margin: 2px;
-  height: 40px;
+  margin-top: 13px;
+  height: 20px;
+  width: 100px;
 }
 
 .VolSeekCont {
@@ -259,20 +263,18 @@ input[type="range"]::-webkit-slider-thumb:active {
 
 .console {
   width: 100px;
-  height: 20px;
-  padding: 3px;
-  margin: 3px;
+  height: 10px; /* Increase height for more log visibility */
+  padding: 5px;
+  margin-top: 15px;
   background-color: #efefe6;
   color: #14467a;
-  align-items: center;
-  text-align: left;
-  font-size: .8em;
+  font-size: 0.8em;
   font-weight: lighter;
-  justify-content: center;
-  align-items: center;
-
-
+  overflow-y: auto; /* Enable scrolling for overflow */
+  
+  
 }
+
 
 
 
