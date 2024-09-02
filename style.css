@@ -264,8 +264,9 @@ input[type="range"]::-webkit-slider-thumb:active {
 
 .console {
   width: 100px;
-  height: 10px; /* Increase height for more log visibility */
+  height: 12px; /* Increase height for more log visibility */
   padding: 5px;
+  
   margin-top: 15px;
   background-color: #efefe6;
   color: #14467a;
