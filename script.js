@@ -28,6 +28,15 @@ const elements = {
     dryDisplay: document.getElementById('display-dry')
 };
 
+// --- Function to Log Messages to Console Div ---
+function logToConsoleDiv(message) {
+    const consoleDisplay = document.getElementById('consoleDisplay');
+    const newLog = document.createElement('div');
+    newLog.textContent = message;
+    consoleDisplay.appendChild(newLog);
+    consoleDisplay.scrollTop = consoleDisplay.scrollHeight; // Auto-scroll to the latest log
+}
+
 // --- Functions to Update and Log Values ---
 function updateDelayAndFeedback() {
     const delayTime = parseFloat(elements.delayTimeControl.value).toFixed(3);
@@ -101,7 +110,6 @@ elements.feedbackControl.addEventListener('input', (event) => {
     updateDelayAndFeedback(); // Always update the display
 });
 
-
 // --- Initializations ---
 const audioApp = {
     context: null,
@@ -121,40 +129,58 @@ const audioApp = {
     isDelayOn: false,
 
     initializeAudioContext() {
-        if (!this.context) {
-            this.context = new (window.AudioContext || window.webkitAudioContext)();
-            this.gainNode = this.context.createGain();
-            this.gainNode.gain.value = 0.5; // Set initial volume
-            this.analyserNode = this.context.createAnalyser();
-            this.analyserNode.fftSize = 256;
-
-            // Initialize Delay and Feedback Gain Nodes for Reverb
-            this.delayNode = this.context.createDelay(5.0);
-            this.delayNode.delayTime.value = 0.5; // Default 500ms delay
-
-            this.feedbackGainNode = this.context.createGain();
-            this.feedbackGainNode.gain.value = 0.5; // Default 50% feedback
-
-            // Initialize wet/dry gain nodes
-            this.wetGainNode = this.context.createGain();
-            this.dryGainNode = this.context.createGain();
-            this.wetGainNode.gain.value = 0.5; // Default 50% wet
-            this.dryGainNode.gain.value = 0.5; // Default 50% dry
-
-            // Connect feedback loop for delay effect
-            this.delayNode.connect(this.feedbackGainNode);
-            this.feedbackGainNode.connect(this.delayNode);
-
-            // Connect to output
-            this.dryGainNode.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
-            this.wetGainNode.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
-
-            elements.onButton.style.border = "2px solid #56a82f";
-            this.log('Audio context initialized with basic reverb.');
-        } else {
-            this.log('Audio context already initialized.');
+        try {
+            if (!this.context) {
+                this.context = new (window.AudioContext || window.webkitAudioContext)();
+                this.gainNode = this.context.createGain();
+                this.gainNode.gain.value = 0.5; // Set initial volume
+                this.analyserNode = this.context.createAnalyser();
+                this.analyserNode.fftSize = 256;
+    
+                // Initialize Delay and Feedback Gain Nodes for Reverb
+                this.delayNode = this.context.createDelay(5.0);
+                this.delayNode.delayTime.value = 0.5; // Default 500ms delay
+    
+                this.feedbackGainNode = this.context.createGain();
+                this.feedbackGainNode.gain.value = 0.5; // Default 50% feedback
+    
+                // Initialize wet/dry gain nodes
+                this.wetGainNode = this.context.createGain();
+                this.dryGainNode = this.context.createGain();
+                this.wetGainNode.gain.value = 0.5; // Default 50% wet
+                this.dryGainNode.gain.value = 0.5; // Default 50% dry
+    
+                // Connect feedback loop for delay effect
+                this.delayNode.connect(this.feedbackGainNode);
+                this.feedbackGainNode.connect(this.delayNode);
+    
+                // Connect to output
+                this.dryGainNode.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+                this.wetGainNode.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+    
+                // Update ON button styling
+                elements.onButton.style.backgroundColor = "#93a01c"; // Green background
+                elements.onButton.style.color = "#f0f0f0"; // Light text color
+                elements.onButton.style.border = "none"; // Remove border styling
+    
+                this.log('Audio context initialized with basic reverb.');
+                logToConsoleDiv('Audio: Initialized'); // Add message to console div
+            } else {
+                this.log('Audio context already initialized.');
+            }
+        } catch (error) {
+            console.error(`Error initializing audio context: ${error.message}`);
+            logToConsoleDiv(`Error initializing audio context: ${error.message}`);
         }
     },
+    
+    
+
+
+
+
+
+
 
     loadAudioFile(file) {
         const reader = new FileReader();
