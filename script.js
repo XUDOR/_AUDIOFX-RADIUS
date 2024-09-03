@@ -11,6 +11,7 @@ const elements = {
     ejectButton: document.getElementById('eject'),
     fileInput: document.getElementById('fileInput'),
     volumeControl: document.getElementById('volume'),
+    volumeValue: document.getElementById('volumeValue'), // Ensure this element exists in your HTML
     timeDisplay: document.querySelector('.time'),
     seekBar: document.getElementById('seekBar'),
     jsonButton: document.querySelector('.json'),
@@ -37,7 +38,6 @@ function logToConsoleDiv(message) {
     consoleDisplay.appendChild(newLog);
 }
 
-
 // --- Functions to Update and Log Values ---
 function updateDelayAndFeedback() {
     const delayTime = parseFloat(elements.delayTimeControl.value).toFixed(3);
@@ -55,6 +55,26 @@ function updateXYValues(x, y) {
     elements.yDisplay.textContent = `y: ${y.toFixed(3)}`;
 
     console.log(`Wet/Dry Mix (x): ${x.toFixed(3)}, (y): ${y.toFixed(3)}`);
+}
+
+function updateVolume() {
+    const volume = elements.volumeControl.value;
+    elements.volumeValue.textContent = `Volume: ${(volume * 100).toFixed(0)}%`; // Update volume display
+    if (audioApp.gainNode) {
+        audioApp.gainNode.gain.value = volume;
+    }
+    console.log(`Volume set to: ${(volume * 100).toFixed(0)}%`);
+    logToConsoleDiv(`Volume: ${(volume * 100).toFixed(0)}%`); // Log message for volume change
+}
+
+function updateSeekBarPosition() {
+    if (audioApp.isPlaying && !audioApp.isSeeking) {
+        audioApp.elapsedTime = audioApp.context.currentTime - audioApp.startTime;
+        elements.seekBar.value = audioApp.elapsedTime;
+        elements.timeDisplay.textContent = `time: ${audioApp.formatTime(audioApp.elapsedTime)} / ${audioApp.formatTime(audioApp.buffer.duration)}`;
+        requestAnimationFrame(updateSeekBarPosition);
+        audioApp.log('Seek bar updated: ' + audioApp.elapsedTime);
+    }
 }
 
 // --- XY Pad Initialization ---
@@ -103,13 +123,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 // --- Event Listeners for Input Controls ---
-elements.delayTimeControl.addEventListener('input', (event) => {
-    updateDelayAndFeedback(); // Always update the display
-});
-
-elements.feedbackControl.addEventListener('input', (event) => {
-    updateDelayAndFeedback(); // Always update the display
-});
+elements.delayTimeControl.addEventListener('input', updateDelayAndFeedback);
+elements.feedbackControl.addEventListener('input', updateDelayAndFeedback);
+elements.volumeControl.addEventListener('input', updateVolume); // Volume control listener
 
 // --- Initializations ---
 const audioApp = {
@@ -156,8 +172,9 @@ const audioApp = {
                 this.feedbackGainNode.connect(this.delayNode);
     
                 // Connect to output
-                this.dryGainNode.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
-                this.wetGainNode.connect(this.gainNode).connect(this.analyserNode).connect(this.context.destination);
+                this.gainNode.connect(this.analyserNode).connect(this.context.destination);
+                this.dryGainNode.connect(this.gainNode);
+                this.wetGainNode.connect(this.gainNode);
     
                 // Update ON button styling
                 elements.onButton.style.backgroundColor = "#93a01c"; // Green background
