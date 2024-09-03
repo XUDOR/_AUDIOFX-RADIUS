@@ -4,21 +4,21 @@ const logs = []; // Array to store logs
 // --- Elements ---
 const elements = {
     onButton: document.getElementById('on'),
+    zeroButton: document.querySelector('.zero'),
     playButton: document.getElementById('play'),
     stopButton: document.getElementById('stop'),
     loopButton: document.getElementById('loop'),
+    ejectButton: document.getElementById('eject'),
     fileInput: document.getElementById('fileInput'),
     volumeControl: document.getElementById('volume'),
     timeDisplay: document.querySelector('.time'),
     seekBar: document.getElementById('seekBar'),
     jsonButton: document.querySelector('.json'),
-    zeroButton: document.querySelector('.zero'),
     meterDisplay: document.querySelector('.meter'),
     toggleDelayButton: document.getElementById('toggleDelay'),
     xyPad: document.getElementById('xyPad'),
     delayTimeControl: document.getElementById('delayTime'),
     feedbackControl: document.getElementById('feedbackControl'),
-
     // Updated toolbar elements with IDs
     tDisplay: document.getElementById('display-t'),
     fDisplay: document.getElementById('display-f'),
@@ -31,11 +31,12 @@ const elements = {
 // --- Function to Log Messages to Console Div ---
 function logToConsoleDiv(message) {
     const consoleDisplay = document.getElementById('consoleDisplay');
+    consoleDisplay.innerHTML = ''; // Clear the console display before adding new message
     const newLog = document.createElement('div');
     newLog.textContent = message;
     consoleDisplay.appendChild(newLog);
-    consoleDisplay.scrollTop = consoleDisplay.scrollHeight; // Auto-scroll to the latest log
 }
+
 
 // --- Functions to Update and Log Values ---
 function updateDelayAndFeedback() {
@@ -174,14 +175,6 @@ const audioApp = {
         }
     },
     
-    
-
-
-
-
-
-
-
     loadAudioFile(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -190,6 +183,7 @@ const audioApp = {
                 elements.seekBar.max = buffer.duration;
                 this.updateSeekBar();
                 this.log('Audio file loaded and decoded.');
+                logToConsoleDiv('File: Loaded'); // Log message for file loaded
             });
         };
         reader.readAsArrayBuffer(file);
@@ -249,6 +243,7 @@ const audioApp = {
         this.updateSeekBar();
         this.drawMeter();
         this.log('Audio started from position: ' + this.elapsedTime);
+        logToConsoleDiv('Playing'); // Log message for playing
     },
 
     toggleDelay() {
@@ -285,6 +280,7 @@ const audioApp = {
             elements.stopButton.style.border = "2px solid #ff0000"; // Red border for paused
             this.log('Audio paused at position: ' + this.elapsedTime);
             this.log('Seek bar position on pause: ' + elements.seekBar.value);
+            logToConsoleDiv('Paused'); // Log message for paused
         }
     },
 
@@ -298,6 +294,7 @@ const audioApp = {
             elements.playButton.style.border = "1px solid black"; // Reset play button border
             elements.stopButton.style.border = "2px solid #ff0000"; // Red border for stopped
             this.log('Audio stopped at position: ' + this.elapsedTime);
+            logToConsoleDiv('Stopped'); // Log message for stopped
         } else {
             this.log('No audio is currently playing to stop.');
         }
@@ -328,59 +325,25 @@ const audioApp = {
         };
 
         draw();
+    },
+
+    clearAudioFile() {
+        if (this.source) {
+            this.source.stop();
+            this.source = null;
+        }
+        this.buffer = null;
+        elements.fileInput.value = ""; // Clear the file input
+        elements.seekBar.value = 0; // Reset the seek bar
+        elements.timeDisplay.textContent = 'time: 0:00 / 0:00'; // Reset time display
+        this.elapsedTime = 0; // Reset elapsed time
+        this.isPlaying = false; // Reset playing state
+        this.log('Audio file ejected.');
+        logToConsoleDiv('Audio: Ejected');
     }
 };
 
-// --- XY Pad Initialization ---
-document.addEventListener('DOMContentLoaded', (event) => {
-    const svg = document.getElementById('xy-controller');
-    const handle = document.getElementById('handle');
-    const valueX = document.getElementById('value-x');
-    const valueY = document.getElementById('value-y');
-    const wetGainNode = audioApp.wetGainNode;
-    const dryGainNode = audioApp.dryGainNode;
-
-    // Function to update the wet/dry mix based on XY pad position
-    const updateMix = (x, y) => {
-        const wetLevel = x / 100;
-        const dryLevel = 1 - wetLevel;
-
-        if (wetGainNode && dryGainNode) {
-            wetGainNode.gain.value = wetLevel;
-            dryGainNode.gain.value = dryLevel;
-            valueX.textContent = `x: ${wetLevel.toFixed(2)}`;
-            valueY.textContent = `y: ${dryLevel.toFixed(2)}`;
-            audioApp.log(`Wet: ${wetLevel.toFixed(2)}, Dry: ${dryLevel.toFixed(2)}`);
-        }
-    };
-
-    // Function to move the handle on the XY pad
-    const moveHandle = (event) => {
-        const rect = svg.getBoundingClientRect();
-        const x = ((event.clientX - rect.left) / rect.width) * 100;
-        const y = 100 - ((event.clientY - rect.top) / rect.height) * 100; // Invert y-coordinate
-
-        handle.setAttribute('cx', x);
-        handle.setAttribute('cy', 100 - y); // Adjust for inverted y-coordinate
-
-        updateMix(x, y); // Update mix levels and display/log values
-    };
-
-    // Event listeners for moving the handle on click and drag
-    svg.addEventListener('mousemove', (event) => {
-        if (event.buttons === 1) {
-            moveHandle(event);
-        }
-    });
-
-    svg.addEventListener('click', (event) => {
-        moveHandle(event);
-    });
-});
-
-
 // --- Event Listeners ---
-
 elements.onButton.addEventListener('click', () => audioApp.initializeAudioContext());
 elements.fileInput.addEventListener('change', (event) => {
     if (!audioApp.context) {
@@ -394,9 +357,9 @@ elements.fileInput.addEventListener('change', (event) => {
     }
 });
 
-
-
-// Ensure this is part of your event listeners section in the JS file
+elements.ejectButton.addEventListener('click', () => {
+    audioApp.clearAudioFile();
+});
 
 elements.zeroButton.addEventListener('click', () => {
     // Reset parameters or any other intended actions for the Zero button
@@ -406,8 +369,8 @@ elements.zeroButton.addEventListener('click', () => {
     
     console.log('Zero button clicked: reset parameters.');
     audioApp.log('Zero button clicked: reset parameters.');
+    logToConsoleDiv('Zeroed'); // Log message for zeroed
 });
-
 
 elements.playButton.addEventListener('click', () => {
     if (!audioApp.context) {
@@ -425,27 +388,29 @@ elements.playButton.addEventListener('click', () => {
         elements.playButton.style.border = "2px solid #007bff"; // Blue border for playing
         elements.stopButton.style.border = "1px solid black"; // Reset stop button border
         audioApp.log('Playing audio.');
+        logToConsoleDiv('Playing'); // Log message for playing
     } else {
         audioApp.pauseAudio(); // Pause if currently playing
         audioApp.log('Pausing audio.');
+        logToConsoleDiv('Paused'); // Log message for paused
     }
 });
 
+elements.stopButton.addEventListener('click', () => {
+    audioApp.stopAudio();
+    logToConsoleDiv('Stopped'); // Log message for stopped
+});
 
-elements.stopButton.addEventListener('click', () => audioApp.stopAudio());
 elements.loopButton.addEventListener('click', () => {
     if (audioApp.buffer && audioApp.context) {
         audioApp.isLooping = !audioApp.isLooping;
         elements.loopButton.style.border = audioApp.isLooping ? "2px solid #f4d30c" : "1px solid black";
         audioApp.log('Looping set to: ' + audioApp.isLooping);
+        logToConsoleDiv(audioApp.isLooping ? 'Loop on' : 'Loop off'); // Log message for loop state
     } else {
         audioApp.log('No audio buffer or context to loop.');
     }
 });
-
-
-
-
 
 elements.toggleDelayButton.addEventListener('click', () => audioApp.toggleDelay());
 
@@ -476,54 +441,6 @@ elements.feedbackControl.addEventListener('input', (event) => {
     }
 });
 
-// --- XY Pad Initialization ---
-document.addEventListener('DOMContentLoaded', (event) => {
-    const svg = document.getElementById('xy-controller');
-    const handle = document.getElementById('handle');
-    const valueX = document.getElementById('value-x');
-    const valueY = document.getElementById('value-y');
-
-    // Function to update the wet/dry mix based on XY pad position
-    const updateMix = (x, y) => {
-        const wetLevel = x / 100;
-        const dryLevel = 1 - wetLevel;
-
-        // Update UI display for XY values
-        elements.xDisplay.textContent = `x: ${wetLevel.toFixed(3)}`;
-        elements.yDisplay.textContent = `y: ${dryLevel.toFixed(3)}`;
-        console.log(`Wet/Dry Mix (x): ${wetLevel.toFixed(3)}, (y): ${dryLevel.toFixed(3)}`);
-
-        // If nodes are initialized, update them
-        if (audioApp.wetGainNode && audioApp.dryGainNode) {
-            audioApp.wetGainNode.gain.value = wetLevel;
-            audioApp.dryGainNode.gain.value = dryLevel;
-        }
-    };
-
-    // Function to move the handle on the XY pad
-    const moveHandle = (event) => {
-        const rect = svg.getBoundingClientRect();
-        const x = ((event.clientX - rect.left) / rect.width) * 100;
-        const y = 100 - ((event.clientY - rect.top) / rect.height) * 100; // Invert y-coordinate
-
-        handle.setAttribute('cx', x);
-        handle.setAttribute('cy', 100 - y); // Adjust for inverted y-coordinate
-
-        updateMix(x, y); // Update mix levels and display/log values
-    };
-
-    // Event listeners for moving the handle on click and drag
-    svg.addEventListener('mousemove', (event) => {
-        if (event.buttons === 1) {
-            moveHandle(event);
-        }
-    });
-
-    svg.addEventListener('click', (event) => {
-        moveHandle(event);
-    });
-});
-
 // --- End of Script Execution ---
 elements.jsonButton.addEventListener('click', () => {
     const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
@@ -535,4 +452,3 @@ elements.jsonButton.addEventListener('click', () => {
     URL.revokeObjectURL(url);
     audioApp.log('Logs exported as JSON.');
 });
-
