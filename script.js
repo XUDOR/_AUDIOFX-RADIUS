@@ -439,6 +439,31 @@ elements.loopButton.addEventListener('click', () => {
     }
 });
 
+// --- Event Listener for Seek Bar Input (User Seeking) ---
+elements.seekBar.addEventListener('input', (event) => {
+    const newTime = parseFloat(event.target.value);
+    audioApp.isSeeking = true;
+    elements.timeDisplay.textContent = `time: ${audioApp.formatTime(newTime)} / ${audioApp.formatTime(audioApp.buffer.duration)}`;
+});
+
+// --- Event Listener for Seek Bar Change (User Finished Seeking) ---
+elements.seekBar.addEventListener('change', (event) => {
+    const newTime = parseFloat(event.target.value);
+    if (audioApp.context && audioApp.buffer) {
+        audioApp.isSeeking = false;
+        audioApp.elapsedTime = newTime;
+        if (audioApp.isPlaying) {
+            audioApp.source.stop();
+            audioApp.playAudio();
+        } else {
+            audioApp.startTime = audioApp.context.currentTime - newTime;
+            elements.timeDisplay.textContent = `time: ${audioApp.formatTime(newTime)} / ${audioApp.formatTime(audioApp.buffer.duration)}`;
+        }
+        audioApp.log('Audio seeked to: ' + newTime);
+        logToConsoleDiv('Seeked to: ' + newTime); // Log message for seeked position
+    }
+});
+
 elements.toggleDelayButton.addEventListener('click', () => audioApp.toggleDelay());
 
 // Update UI regardless of initialization
