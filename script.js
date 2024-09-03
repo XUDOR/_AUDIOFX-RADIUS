@@ -59,13 +59,23 @@ function updateXYValues(x, y) {
 
 function updateVolume() {
     const volume = elements.volumeControl.value;
-    elements.volumeValue.textContent = `Volume: ${(volume * 100).toFixed(0)}%`; // Update volume display
+
+    // Check if volumeValue element exists
+    if (elements.volumeValue) {
+        elements.volumeValue.textContent = `Volume: ${(volume * 100).toFixed(0)}%`; // Update volume display
+    }
+
     if (audioApp.gainNode) {
         audioApp.gainNode.gain.value = volume;
     }
+
+    // Update the slider thumb with the volume value
+    elements.volumeControl.setAttribute('data-volume', `${(volume * 100).toFixed(0)}%`);
+
     console.log(`Volume set to: ${(volume * 100).toFixed(0)}%`);
     logToConsoleDiv(`Volume: ${(volume * 100).toFixed(0)}%`); // Log message for volume change
 }
+
 
 function updateSeekBarPosition() {
     if (audioApp.isPlaying && !audioApp.isSeeking) {
