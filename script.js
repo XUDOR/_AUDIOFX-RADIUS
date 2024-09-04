@@ -11,7 +11,7 @@ const elements = {
     ejectButton: document.getElementById('eject'),
     fileInput: document.getElementById('fileInput'),
     volumeControl: document.getElementById('volume'),
-    volumeValue: document.getElementById('volumeValue'), // Ensure this element exists in your HTML
+    volumeValue: document.getElementById('volumeValue'),
     timeDisplay: document.querySelector('.time'),
     seekBar: document.getElementById('seekBar'),
     jsonButton: document.querySelector('.json'),
@@ -20,7 +20,6 @@ const elements = {
     xyPad: document.getElementById('xyPad'),
     delayTimeControl: document.getElementById('delayTime'),
     feedbackControl: document.getElementById('feedbackControl'),
-    // Updated toolbar elements with IDs
     tDisplay: document.getElementById('display-t'),
     fDisplay: document.getElementById('display-f'),
     xDisplay: document.getElementById('display-x'),
@@ -60,22 +59,19 @@ function updateXYValues(x, y) {
 function updateVolume() {
     const volume = elements.volumeControl.value;
 
-    // Check if volumeValue element exists
     if (elements.volumeValue) {
-        elements.volumeValue.textContent = `Volume: ${(volume * 100).toFixed(0)}%`; // Update volume display
+        elements.volumeValue.textContent = `Volume: ${(volume * 100).toFixed(0)}%`;
     }
 
     if (audioApp.gainNode) {
         audioApp.gainNode.gain.value = volume;
     }
 
-    // Update the slider thumb with the volume value
     elements.volumeControl.setAttribute('data-volume', `${(volume * 100).toFixed(0)}%`);
 
     console.log(`Volume set to: ${(volume * 100).toFixed(0)}%`);
-    logToConsoleDiv(`Volume: ${(volume * 100).toFixed(0)}%`); // Log message for volume change
+    logToConsoleDiv(`Volume: ${(volume * 100).toFixed(0)}%`);
 }
-
 
 function updateSeekBarPosition() {
     if (audioApp.isPlaying && !audioApp.isSeeking) {
@@ -93,58 +89,46 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const handle = document.getElementById('handle');
 
     const updateMix = (x, y) => {
-        // Convert X and Y to wet and dry levels
-        const wetLevel = (y / 100).toFixed(3); // Y controls wet level
-        const dryLevel = (x / 100).toFixed(3); // X controls dry level
+        const wetLevel = (y / 100).toFixed(3);
+        const dryLevel = (x / 100).toFixed(3);
     
-        // Update UI display for XY values
         elements.xDisplay.textContent = `x: ${dryLevel}`;
         elements.yDisplay.textContent = `y: ${wetLevel}`;
         elements.wetDisplay.textContent = `wet: ${(wetLevel * 100).toFixed(2)}%`;
         elements.dryDisplay.textContent = `dry: ${(dryLevel * 100).toFixed(2)}%`;
         console.log(`Wet/Dry Mix (x): ${dryLevel}, (y): ${wetLevel}`);
     
-        // Update gains if nodes are initialized
         if (audioApp.wetGainNode && audioApp.dryGainNode) {
-            // Always update dry gain
-            audioApp.dryGainNode.gain.value = parseFloat(dryLevel);  
+            audioApp.dryGainNode.gain.value = parseFloat(dryLevel);
     
-            // Update wet gain based on delay state and wet level
             if (audioApp.isDelayOn) {
-                // If delay is on, set wet gain according to the wet level
                 audioApp.wetGainNode.gain.value = parseFloat(wetLevel);
             } else {
-                // Mute wet signal if delay is off
                 audioApp.wetGainNode.gain.value = 0;
             }
         }
     
-        // Ensure the correct routing of audio nodes based on delay state
         if (audioApp.source) {
-            audioApp.source.disconnect(); // Disconnect any existing connections
+            audioApp.source.disconnect();
     
             if (audioApp.isDelayOn) {
-                // Connect source to both delay (wet path) and dryGainNode
                 audioApp.source.connect(audioApp.delayNode).connect(audioApp.wetGainNode);
                 audioApp.source.connect(audioApp.dryGainNode);
             } else {
-                // Connect source only to dryGainNode
                 audioApp.source.connect(audioApp.dryGainNode);
             }
         }
     };
-    
-    
 
     const moveHandle = (event) => {
         const rect = svg.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * 100;
-        const y = 100 - ((event.clientY - rect.top) / rect.height) * 100; // Invert y-coordinate
+        const y = 100 - ((event.clientY - rect.top) / rect.height) * 100;
 
         handle.setAttribute('cx', x);
-        handle.setAttribute('cy', 100 - y); // Adjust for inverted y-coordinate
+        handle.setAttribute('cy', 100 - y);
 
-        updateMix(x, y); // Update mix levels and display/log values
+        updateMix(x, y);
     };
 
     svg.addEventListener('mousemove', (event) => {
@@ -161,7 +145,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 // --- Event Listeners for Input Controls ---
 elements.delayTimeControl.addEventListener('input', updateDelayAndFeedback);
 elements.feedbackControl.addEventListener('input', updateDelayAndFeedback);
-elements.volumeControl.addEventListener('input', updateVolume); // Volume control listener
+elements.volumeControl.addEventListener('input', updateVolume);
 
 // --- Initializations ---
 const audioApp = {
@@ -186,39 +170,34 @@ const audioApp = {
             if (!this.context) {
                 this.context = new (window.AudioContext || window.webkitAudioContext)();
                 this.gainNode = this.context.createGain();
-                this.gainNode.gain.value = 0.5; // Set initial volume
+                this.gainNode.gain.value = 0.5;
                 this.analyserNode = this.context.createAnalyser();
-                this.analyserNode.fftSize = 256;
+                this.analyserNode.fftSize = 2048;
     
-                // Initialize Delay and Feedback Gain Nodes for Reverb
                 this.delayNode = this.context.createDelay(5.0);
-                this.delayNode.delayTime.value = 0.5; // Default 500ms delay
+                this.delayNode.delayTime.value = 0.5;
     
                 this.feedbackGainNode = this.context.createGain();
-                this.feedbackGainNode.gain.value = 0.5; // Default 50% feedback
+                this.feedbackGainNode.gain.value = 0.5;
     
-                // Initialize wet/dry gain nodes
                 this.wetGainNode = this.context.createGain();
                 this.dryGainNode = this.context.createGain();
-                this.wetGainNode.gain.value = 0.5; // Default 50% wet
-                this.dryGainNode.gain.value = 0.5; // Default 50% dry
+                this.wetGainNode.gain.value = 0.5;
+                this.dryGainNode.gain.value = 0.5;
     
-                // Connect feedback loop for delay effect
                 this.delayNode.connect(this.feedbackGainNode);
                 this.feedbackGainNode.connect(this.delayNode);
     
-                // Connect to output
                 this.gainNode.connect(this.analyserNode).connect(this.context.destination);
                 this.dryGainNode.connect(this.gainNode);
                 this.wetGainNode.connect(this.gainNode);
     
-                // Update ON button styling
-                elements.onButton.style.backgroundColor = "#93a01c"; // Green background
-                elements.onButton.style.color = "#f0f0f0"; // Light text color
-                elements.onButton.style.border = "none"; // Remove border styling
+                elements.onButton.style.backgroundColor = "#93a01c";
+                elements.onButton.style.color = "#f0f0f0";
+                elements.onButton.style.border = "none";
     
                 this.log('Audio context initialized with basic reverb.');
-                logToConsoleDiv('Audio: Initialized'); // Add message to console div
+                logToConsoleDiv('Audio: Initialized');
             } else {
                 this.log('Audio context already initialized.');
             }
@@ -227,7 +206,7 @@ const audioApp = {
             logToConsoleDiv(`Error initializing audio context: ${error.message}`);
         }
     },
-    
+
     loadAudioFile(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -236,13 +215,12 @@ const audioApp = {
                 elements.seekBar.max = buffer.duration;
                 this.updateSeekBar();
                 this.log('Audio file loaded and decoded.');
-                logToConsoleDiv('File: Loaded'); // Log message for file loaded
+                logToConsoleDiv('File: Loaded');
             });
         };
         reader.readAsArrayBuffer(file);
     },
 
-    // --- Helper Functions ---
     log(message) {
         logs.push({ timestamp: new Date().toISOString(), message });
         console.log(message);
@@ -264,19 +242,17 @@ const audioApp = {
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     },
 
-    // --- Audio Processing ---
     playAudio() {
         this.source = this.context.createBufferSource();
         this.source.buffer = this.buffer;
 
-        // Connect nodes for reverb and gain
         if (this.isDelayOn) {
             this.source.connect(this.delayNode).connect(this.wetGainNode);
         } else {
             this.source.connect(this.dryGainNode);
         }
 
-        this.source.loop = false;  // Loop handled manually
+        this.source.loop = false;
 
         this.startTime = this.context.currentTime - this.elapsedTime;
         this.source.start(0, this.elapsedTime);
@@ -284,19 +260,55 @@ const audioApp = {
 
         this.source.onended = () => {
             if (this.isLooping) {
-                this.elapsedTime = 0;  // Reset elapsed time for looping
-                this.playAudio();  // Restart audio for loop
+                this.elapsedTime = 0;
+                this.playAudio();
                 this.log('Looping audio.');
             } else {
-                this.pauseAudio(); // Pause instead of resetting
+                this.pauseAudio();
                 this.log('Audio playback ended.');
             }
         };
 
         this.updateSeekBar();
-        this.drawMeter();
+        this.drawFFTWaveform(); // Start visualizing FFT waveform
         this.log('Audio started from position: ' + this.elapsedTime);
-        logToConsoleDiv('Playing'); // Log message for playing
+        logToConsoleDiv('Playing');
+    },
+
+    drawFFTWaveform() {
+        const svg = document.getElementById('fft-visualizer');
+        const waveform = document.getElementById('waveform');
+        const analyser = this.analyserNode;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        const updateWaveform = () => {
+            analyser.getByteTimeDomainData(dataArray);
+
+            let pathData = '';
+            const width = svg.clientWidth;
+            const height = svg.clientHeight;
+            const sliceWidth = width / bufferLength;
+
+            for (let i = 0; i < bufferLength; i++) {
+                const v = dataArray[i] / 128.0;
+                const y = v * height / 2;
+
+                if (i === 0) {
+                    pathData += `M ${i * sliceWidth} ${y}`;
+                } else {
+                    pathData += ` L ${i * sliceWidth} ${y}`;
+                }
+            }
+
+            waveform.setAttribute('d', pathData);
+
+            if (this.isPlaying) {
+                requestAnimationFrame(updateWaveform);
+            }
+        };
+
+        updateWaveform();
     },
 
     toggleDelay() {
@@ -308,32 +320,32 @@ const audioApp = {
         if (this.isDelayOn) {
             this.source.disconnect();
             this.source.connect(this.dryGainNode);
-            elements.toggleDelayButton.style.backgroundColor = '#617068'; // Off state color
-            elements.toggleDelayButton.textContent = 'off'; // Update button text to "off"
-            elements.toggleDelayButton.style.color = '#efefe6'; // Text color for dark background
+            elements.toggleDelayButton.style.backgroundColor = '#617068';
+            elements.toggleDelayButton.textContent = 'off';
+            elements.toggleDelayButton.style.color = '#efefe6';
             this.log('Delay effect turned off.');
         } else {
             this.source.disconnect();
             this.source.connect(this.delayNode).connect(this.wetGainNode);
-            elements.toggleDelayButton.style.backgroundColor = '#c5d8d6'; // On state color
-            elements.toggleDelayButton.textContent = 'on'; // Update button text to "on"
-            elements.toggleDelayButton.style.color = '#000000'; // Text color for light background
+            elements.toggleDelayButton.style.backgroundColor = '#c5d8d6';
+            elements.toggleDelayButton.textContent = 'on';
+            elements.toggleDelayButton.style.color = '#000000';
             this.log('Delay effect turned on.');
         }
 
-        this.isDelayOn = !this.isDelayOn; // Toggle state
+        this.isDelayOn = !this.isDelayOn;
     },
 
     pauseAudio() {
         if (this.source) {
             this.source.stop();
             this.isPlaying = false;
-            this.elapsedTime = this.context.currentTime - this.startTime; // Save current position
-            elements.playButton.style.border = "1px solid black"; // Reset play button border
-            elements.stopButton.style.border = "2px solid #ff0000"; // Red border for paused
+            this.elapsedTime = this.context.currentTime - this.startTime;
+            elements.playButton.style.border = "1px solid black";
+            elements.stopButton.style.border = "2px solid #ff0000";
             this.log('Audio paused at position: ' + this.elapsedTime);
             this.log('Seek bar position on pause: ' + elements.seekBar.value);
-            logToConsoleDiv('Paused'); // Log message for paused
+            logToConsoleDiv('Paused');
         }
     },
 
@@ -341,43 +353,16 @@ const audioApp = {
         if (this.source) {
             this.source.stop();
             this.isPlaying = false;
-            this.isLooping = false; // Stop looping when stopped
-            elements.loopButton.style.border = "1px solid black"; // Reset loop button border
-            elements.seekBar.value = this.elapsedTime; // Update seek bar to current position
-            elements.playButton.style.border = "1px solid black"; // Reset play button border
-            elements.stopButton.style.border = "2px solid #ff0000"; // Red border for stopped
+            this.isLooping = false;
+            elements.loopButton.style.border = "1px solid black";
+            elements.seekBar.value = this.elapsedTime;
+            elements.playButton.style.border = "1px solid black";
+            elements.stopButton.style.border = "2px solid #ff0000";
             this.log('Audio stopped at position: ' + this.elapsedTime);
-            logToConsoleDiv('Stopped'); // Log message for stopped
+            logToConsoleDiv('Stopped');
         } else {
             this.log('No audio is currently playing to stop.');
         }
-    },
-
-    drawMeter() {
-        const bufferLength = this.analyserNode.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        const meterWidth = 100; // Width of the meter in pixels
-
-        const draw = () => {
-            this.analyserNode.getByteFrequencyData(dataArray);
-            let sum = 0;
-            dataArray.forEach(value => sum += value);
-            let average = sum / dataArray.length;
-
-            // Calculate the fill width of the meter based on the average amplitude
-            let fillWidth = (average / 255) * meterWidth;
-
-            // Update meter display
-            elements.meterDisplay.style.width = `${fillWidth}px`;
-            elements.meterDisplay.style.height = '30px'; // Height of the meter
-            elements.meterDisplay.style.backgroundColor = '#79a31c'; // Solid green color for the meter
-
-            if (this.isPlaying) {
-                requestAnimationFrame(draw);
-            }
-        };
-
-        draw();
     },
 
     clearAudioFile() {
@@ -386,11 +371,11 @@ const audioApp = {
             this.source = null;
         }
         this.buffer = null;
-        elements.fileInput.value = ""; // Clear the file input
-        elements.seekBar.value = 0; // Reset the seek bar
-        elements.timeDisplay.textContent = 'time: 0:00 / 0:00'; // Reset time display
-        this.elapsedTime = 0; // Reset elapsed time
-        this.isPlaying = false; // Reset playing state
+        elements.fileInput.value = "";
+        elements.seekBar.value = 0;
+        elements.timeDisplay.textContent = 'time: 0:00 / 0:00';
+        this.elapsedTime = 0;
+        this.isPlaying = false;
         this.log('Audio file ejected.');
         logToConsoleDiv('Audio: Ejected');
     }
@@ -401,7 +386,7 @@ elements.onButton.addEventListener('click', () => audioApp.initializeAudioContex
 elements.fileInput.addEventListener('change', (event) => {
     if (!audioApp.context) {
         alert("--> Please use the ON button to turn on Audio Function");
-        return;  // Stop further execution if the context is not initialized
+        return;
     }
 
     const file = event.target.files[0];
@@ -415,14 +400,13 @@ elements.ejectButton.addEventListener('click', () => {
 });
 
 elements.zeroButton.addEventListener('click', () => {
-    // Reset parameters or any other intended actions for the Zero button
-    audioApp.elapsedTime = 0; // Reset elapsed time
-    elements.seekBar.value = 0; // Reset seek bar to the start
-    elements.timeDisplay.textContent = 'time: 0:00 / 0:00'; // Reset time display
+    audioApp.elapsedTime = 0;
+    elements.seekBar.value = 0;
+    elements.timeDisplay.textContent = 'time: 0:00 / 0:00';
     
     console.log('Zero button clicked: reset parameters.');
     audioApp.log('Zero button clicked: reset parameters.');
-    logToConsoleDiv('Zeroed'); // Log message for zeroed
+    logToConsoleDiv('Zeroed');
 });
 
 elements.playButton.addEventListener('click', () => {
@@ -438,20 +422,20 @@ elements.playButton.addEventListener('click', () => {
 
     if (!audioApp.isPlaying) {
         audioApp.playAudio();
-        elements.playButton.style.border = "2px solid #007bff"; // Blue border for playing
-        elements.stopButton.style.border = "1px solid black"; // Reset stop button border
+        elements.playButton.style.border = "2px solid #007bff";
+        elements.stopButton.style.border = "1px solid black";
         audioApp.log('Playing audio.');
-        logToConsoleDiv('Playing'); // Log message for playing
+        logToConsoleDiv('Playing');
     } else {
-        audioApp.pauseAudio(); // Pause if currently playing
+        audioApp.pauseAudio();
         audioApp.log('Pausing audio.');
-        logToConsoleDiv('Paused'); // Log message for paused
+        logToConsoleDiv('Paused');
     }
 });
 
 elements.stopButton.addEventListener('click', () => {
     audioApp.stopAudio();
-    logToConsoleDiv('Stopped'); // Log message for stopped
+    logToConsoleDiv('Stopped');
 });
 
 elements.loopButton.addEventListener('click', () => {
@@ -459,20 +443,18 @@ elements.loopButton.addEventListener('click', () => {
         audioApp.isLooping = !audioApp.isLooping;
         elements.loopButton.style.border = audioApp.isLooping ? "2px solid #f4d30c" : "1px solid black";
         audioApp.log('Looping set to: ' + audioApp.isLooping);
-        logToConsoleDiv(audioApp.isLooping ? 'Loop on' : 'Loop off'); // Log message for loop state
+        logToConsoleDiv(audioApp.isLooping ? 'Loop on' : 'Loop off');
     } else {
         audioApp.log('No audio buffer or context to loop.');
     }
 });
 
-// --- Event Listener for Seek Bar Input (User Seeking) ---
 elements.seekBar.addEventListener('input', (event) => {
     const newTime = parseFloat(event.target.value);
     audioApp.isSeeking = true;
     elements.timeDisplay.textContent = `time: ${audioApp.formatTime(newTime)} / ${audioApp.formatTime(audioApp.buffer.duration)}`;
 });
 
-// --- Event Listener for Seek Bar Change (User Finished Seeking) ---
 elements.seekBar.addEventListener('change', (event) => {
     const newTime = parseFloat(event.target.value);
     if (audioApp.context && audioApp.buffer) {
@@ -486,40 +468,32 @@ elements.seekBar.addEventListener('change', (event) => {
             elements.timeDisplay.textContent = `time: ${audioApp.formatTime(newTime)} / ${audioApp.formatTime(audioApp.buffer.duration)}`;
         }
         audioApp.log('Audio seeked to: ' + newTime);
-        logToConsoleDiv('Seeked to: ' + newTime); // Log message for seeked position
+        logToConsoleDiv('Seeked to: ' + newTime);
     }
 });
 
 elements.toggleDelayButton.addEventListener('click', () => audioApp.toggleDelay());
 
-// Update UI regardless of initialization
 elements.delayTimeControl.addEventListener('input', (event) => {
-    const delayTime = event.target.value; // Get the delay time in milliseconds
-
-    // Update the UI display for delay time
+    const delayTime = event.target.value;
     elements.tDisplay.textContent = `t: ${parseFloat(delayTime).toFixed(3)} ms`;
     console.log(`Delay Time (t): ${parseFloat(delayTime).toFixed(3)} ms`);
 
-    // If delay node is initialized, update it
     if (audioApp.delayNode) {
-        audioApp.delayNode.delayTime.value = delayTime / 1000; // Convert to seconds
+        audioApp.delayNode.delayTime.value = delayTime / 1000;
     }
 });
 
 elements.feedbackControl.addEventListener('input', (event) => {
-    const feedback = event.target.value; // Get the feedback percentage
-
-    // Update the UI display for feedback
+    const feedback = event.target.value;
     elements.fDisplay.textContent = `f: ${(parseFloat(feedback) * 100).toFixed(2)}%`;
     console.log(`Feedback (f): ${(parseFloat(feedback) * 100).toFixed(2)}%`);
 
-    // If feedback gain node is initialized, update it
     if (audioApp.feedbackGainNode) {
         audioApp.feedbackGainNode.gain.value = parseFloat(feedback);
     }
 });
 
-// --- End of Script Execution ---
 elements.jsonButton.addEventListener('click', () => {
     const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
