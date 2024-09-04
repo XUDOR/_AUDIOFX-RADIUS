@@ -93,22 +93,48 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const handle = document.getElementById('handle');
 
     const updateMix = (x, y) => {
-        const wetLevel = (x / 100).toFixed(3);
-        const dryLevel = (1 - x / 100).toFixed(3);
-
+        // Convert X and Y to wet and dry levels
+        const wetLevel = (y / 100).toFixed(3); // Y controls wet level
+        const dryLevel = (x / 100).toFixed(3); // X controls dry level
+    
         // Update UI display for XY values
-        elements.xDisplay.textContent = `x: ${wetLevel}`;
-        elements.yDisplay.textContent = `y: ${dryLevel}`;
+        elements.xDisplay.textContent = `x: ${dryLevel}`;
+        elements.yDisplay.textContent = `y: ${wetLevel}`;
         elements.wetDisplay.textContent = `wet: ${(wetLevel * 100).toFixed(2)}%`;
         elements.dryDisplay.textContent = `dry: ${(dryLevel * 100).toFixed(2)}%`;
-        console.log(`Wet/Dry Mix (x): ${wetLevel}, (y): ${dryLevel}`);
-
+        console.log(`Wet/Dry Mix (x): ${dryLevel}, (y): ${wetLevel}`);
+    
         // Update gains if nodes are initialized
         if (audioApp.wetGainNode && audioApp.dryGainNode) {
-            audioApp.wetGainNode.gain.value = parseFloat(wetLevel);
-            audioApp.dryGainNode.gain.value = parseFloat(dryLevel);
+            // Always update dry gain
+            audioApp.dryGainNode.gain.value = parseFloat(dryLevel);  
+    
+            // Update wet gain based on delay state and wet level
+            if (audioApp.isDelayOn) {
+                // If delay is on, set wet gain according to the wet level
+                audioApp.wetGainNode.gain.value = parseFloat(wetLevel);
+            } else {
+                // Mute wet signal if delay is off
+                audioApp.wetGainNode.gain.value = 0;
+            }
+        }
+    
+        // Ensure the correct routing of audio nodes based on delay state
+        if (audioApp.source) {
+            audioApp.source.disconnect(); // Disconnect any existing connections
+    
+            if (audioApp.isDelayOn) {
+                // Connect source to both delay (wet path) and dryGainNode
+                audioApp.source.connect(audioApp.delayNode).connect(audioApp.wetGainNode);
+                audioApp.source.connect(audioApp.dryGainNode);
+            } else {
+                // Connect source only to dryGainNode
+                audioApp.source.connect(audioApp.dryGainNode);
+            }
         }
     };
+    
+    
 
     const moveHandle = (event) => {
         const rect = svg.getBoundingClientRect();
