@@ -308,7 +308,7 @@ input[type="range"]::-ms-thumb {
 /* ========================================____===================================== */
 .effectContainer {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   /* Two columns of equal width */
   grid-template-rows: auto;
   /* Automatically adjust row height */
@@ -443,7 +443,7 @@ input[type="range"] {
 #feedbackControl {
   margin-top: 5px;
   height: 25px;
-  width: 170px;
+  width: 200px;
 }
 
 .DelayCont {
@@ -457,8 +457,24 @@ input[type="range"] {
   width: 50%;
   height: 60px;
 
+}
+
+.outputDISP{
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid #065a82;
+  margin: 2px;
+  width: 300px;
+  height: 150px;
+  padding: 3px;
+  font-size: 0.8em;
+
 
 }
+
+
+
+
 
 
 
