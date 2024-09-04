@@ -67,9 +67,12 @@
                 </svg>
             </div>
             <div class="outputDISP">
-                <svg id="fft-visualizer" width="500" height="150">
-                    <!-- FFT waveform will be dynamically drawn here -->
-                    <path id="waveform" fill="none" stroke="#3c4745" stroke-width="1" />
+                <div>
+                    <button id="zoom-in">+</button>
+                    <button id="zoom-out">-</button>
+                </div>
+                <svg id="fft-visualizer" width="500" height="200">
+                    <path id="waveform" stroke="black" fill="none"/>
                 </svg>
             </div>
             
