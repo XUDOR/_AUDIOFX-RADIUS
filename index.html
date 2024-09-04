@@ -66,7 +66,13 @@
                     <circle id="handle" cx="50" cy="50" r="4" fill="green" />
                 </svg>
             </div>
-            <div class="outputDISP">output:</div>
+            <div class="outputDISP">
+                <svg id="fft-visualizer" width="500" height="150">
+                    <!-- FFT waveform will be dynamically drawn here -->
+                    <path id="waveform" fill="none" stroke="#3c4745" stroke-width="1" />
+                </svg>
+            </div>
+            
             <div class="DelayCont">
                 <div>
                     <label>Delay Time (ms):</label>
